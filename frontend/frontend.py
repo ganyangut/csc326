@@ -1,20 +1,34 @@
-from bottle import route, run, template, get, post, request
+import Queue
 
+from bottle import Bottle, route, run, template, get, post, request
+
+history = Queue.LifoQueue(maxsize=20)
+
+# ask for keywords from user 
 @get('/') # or @route('/')
 def submit_form():
     return '''
         <form action="/" method="post">
-            <input name="keyword_string" type="keyword" />            
+            <input name="keywords" type="text" />            
             <input value="Search" type="submit" />
         </form>
     '''
 
+# show search results, word count, and search history
 @post('/') # or @route('/', method='POST')
 def show_results():
-    keyword_string = request.forms.get('keyword_string')
-    if keyword_string == "qwerty": 
-        return "<p>You searched the right thing.</p>"
-    else:
-        return "<p>Fucking stupid.</p>"
+    # http get recorded keyword
+    keywords = request.forms.get('keywords')
+    # store kwyword history in a fixed size last-in-first-out queue
+    history.put(keywords)
+    # split keyword string into words and count them
+    # store them in a dictionary
+    words_list = keywords.split()
+    words_count = {word:words_list.count(word) for word in words_list}
 
-run(host='localhost', port=8080, debug=True)
+    #TEMPLATE_PATH.append('/nfs/ug/homes-0/y/yanggan/csc326/frontend')
+   
+    return template('results_page_template', keywords=keywords, words_count=words_count, history=history)
+
+# run server
+run(host='localhost', port=8081, debug=True)
