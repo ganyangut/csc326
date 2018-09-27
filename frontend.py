@@ -1,4 +1,5 @@
 import Queue
+import operator
 
 from bottle import Bottle, route, run, template, get, post, request
 
@@ -22,8 +23,12 @@ def show_results():
     # TODO: store kwyword history in a fixed size last-in-first-out queue
     if keywords in history:
         history[keywords] += 1
-    else #>20 or <20
+    else if len(history) == 20:
 
+
+
+    sorted_history = sorted(history.items(), key=operator.itemgetter(1))
+    
     # split keyword string into words and count them
     # store them in a dictionary
     words_list = keywords.split()
