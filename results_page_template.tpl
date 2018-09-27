@@ -21,13 +21,13 @@
 
 <table id=”history”>
     <tr>
-        <td>No.</td>
         <td>Keywords</td>
+        <td>Times Searched</td>
     </tr>
-% for number in range(history.qsize()):
+% for entry in history:
     <tr>
-        <td>{{number+1}}</td>
-        <td>{{history.get()}}</td>
+        <td>{{entry}}</td>
+        <td>{{history[entry]}}</td>
     </tr>
 % end
 </table>
