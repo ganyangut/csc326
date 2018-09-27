@@ -1,9 +1,9 @@
 import Queue
 import operator
-
+from data_structures import history
 from bottle import Bottle, route, run, template, get, post, request
 
-history = dict()
+history = history()
 
 # ask for keywords from user 
 @get('/') # or @route('/')
@@ -20,14 +20,7 @@ def submit_form():
 def show_results():
     # http get recorded keyword
     keywords = request.forms.get('keywords')
-    # TODO: store kwyword history in a fixed size last-in-first-out queue
-    if keywords in history:
-        history[keywords] += 1
-    else if len(history) == 20:
-
-
-
-    sorted_history = sorted(history.items(), key=operator.itemgetter(1))
+    history.add_new_keyword(keywords)
     
     # split keyword string into words and count them
     # store them in a dictionary
@@ -37,7 +30,7 @@ def show_results():
     #TEMPLATE_PATH.append('/nfs/ug/homes-0/y/yanggan/csc326/frontend')
 
    
-    return template('results_page_template', keywords=keywords, words_count=words_count, history=history)
+    return template('results_page_template', keywords=keywords, words_count=words_count, history=history.items())
 
 
 # run server
