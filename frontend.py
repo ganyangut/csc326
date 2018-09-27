@@ -48,8 +48,6 @@ def show_results():
 
 
 
-
-
 # run server
 run(host='localhost', port=8081, debug=True)
 
