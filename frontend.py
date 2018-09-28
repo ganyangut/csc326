@@ -1,7 +1,10 @@
 import Queue
 import operator
+
 from data_structures import history
-from bottle import Bottle, route, run, template, get, post, request
+from bottle import Bottle, route, run, template, get, post, request,staitc_file
+
+
 
 
 # declare golbal variables
@@ -19,11 +22,21 @@ def submit_form():
     '''
 
 
+@route('/static/<filename:path>')
+def send_static(filename):
+    return static_file(filename, root='./templates')
+  
+
 # show search results, word count, and search history
 @post('/') # or @route('/', method='POST')
 def show_results():
     # keyword from http get
     keywords = request.forms.get('keywords')
+
+    # TODO: store kwyword history in a fixed size last-in-first-out queue
+    if keywords in history:
+        history[keywords] += 1
+    #else if len(history) == 20:
 
     # add keyword to history
     history.add_new_keyword(keywords)
@@ -35,8 +48,10 @@ def show_results():
 
     #TEMPLATE_PATH.append('/nfs/ug/homes-0/y/yanggan/csc326/frontend')
 
-   
-    return template('results_page_template', keywords=keywords, words_count=words_count, history=history.get_popular())
+
+    return template('/templates/results_page_template.tpl', keywords=keywords, words_count=words_count, history=history)
+
+
 
 
 # run server
