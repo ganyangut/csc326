@@ -37,8 +37,8 @@
     </tr>
 % for entry in history:
     <tr>
-        <td>{{entry}}</td>
-        <td>{{history[entry]}}</td>
+        <td>{{entry[0]}}</td>
+        <td>{{entry[1][0]}}</td>
     </tr>
 % end
 </table>
