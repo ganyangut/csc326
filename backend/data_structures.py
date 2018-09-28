@@ -4,8 +4,7 @@ from collections import OrderedDict
 class history(OrderedDict):    
     
     def __init__(self):
-        OrderedDict.__init__(self)
-    
+        OrderedDict.__init__(self)    
     
     # the format of each entry is 
     # keyword : (number of times searched, how recent the keyword is saerched)
@@ -22,8 +21,7 @@ class history(OrderedDict):
             self[keyword] = (1,1)        
         
         # sort the history after adding new keyword
-        self.sort()
-        
+        self.sort()        
     
     def sort(self):
         # sort key word by "number of times searched" first
@@ -35,17 +33,14 @@ class history(OrderedDict):
         for entry in temp:
             self[entry] = temp[entry]
 
-
     # add 1 to "how recent the keyword is saerched" for every existing  
     def make_keywords_old(self):        
         for keyword in self:
             self[keyword] = (self[keyword][0],self[keyword][1]+1)
-
     
     def get_last(self):
         last = next(reversed(self))
         return (last,self[last])
-
     
     # get up to 20 popular keywords in history
     def get_popular(self):        
