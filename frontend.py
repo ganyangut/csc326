@@ -28,15 +28,18 @@ def send_static(filename):
 @post('/') # or @route('/', method='POST')
 def show_results():
     # keyword from http get
-    keywords = request.forms.get('keywords')
-
-    # add keyword to history
-    history.add_new_keyword(keywords)
+    keywords = request.forms.get('keywords')    
     
     # split keyword string into words and count them
     # store words in a dict
     words_list = keywords.split()
     words_count = {word:words_list.count(word) for word in words_list}
+
+    # add keyword to history
+    # joining words instead of the original string to avoid multiple whitespaces
+    history.add_new_keyword(' '.join(words_list))
+
+
 
     #TEMPLATE_PATH.append('/nfs/ug/homes-0/y/yanggan/csc326/frontend')
 
