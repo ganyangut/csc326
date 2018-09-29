@@ -8,7 +8,7 @@ database framework:
         dict {document id: document}
 
         document
-            tuple (url, depth, words, links)
+            list [url, depth, title, short_description, words, links]
 
             words
                 list [word]
@@ -17,7 +17,7 @@ database framework:
                     tuple (word id, font size)
 
             links
-                
+                dict {to_doc_id: number of links}                
 
     lexicon # keeps a list of words
         dict {word id: word string}
