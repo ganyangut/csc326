@@ -68,15 +68,15 @@ class document_index(OrderedDict):
 
 class document():    
     
-    def __init__(self, url="", depth=0, title="", short_description="", words=None, links=None):
-        if not isinstance(url, str):
-            raise ValueError("document url must be a str")
+    def __init__(self, url="", depth=0, title="", short_description="", words=None, links={ }):
+        if not isinstance(url, basestring):
+            raise ValueError("document url must be a basestring")
         if not isinstance(depth, int):
             raise ValueError("document depth must be an int")
-        if not isinstance(title, str):
-            raise ValueError("document title must be a str")
-        if not isinstance(short_description, str):
-            raise ValueError("document short_description must be a str")
+        if not isinstance(title, basestring):
+            raise ValueError("document title must be a basestring")
+        if not isinstance(short_description, basestring):
+            raise ValueError("document short_description must be a basestring")
         self.url = url
         self.depth = depth
         self.title = title
@@ -128,8 +128,8 @@ class lexicon(dict):
     def __setitem__(self, key, val):
         if not isinstance(key, int):
             raise ValueError("lexicon key must be an int")
-        if not isinstance(val, str):
-            raise ValueError("lexicon value must be a str")
+        if not isinstance(val, basestring):
+            raise ValueError("lexicon value must be a basestring")
         return dict.__setitem__(self, key, val)
 
 class inverted_index(dict):    
@@ -161,17 +161,17 @@ class resolved_inverted_index(dict):
         dict.__init__(self)
 
     def __setitem__(self, key, val):
-        if not isinstance(key, str):
-            raise ValueError("resolved_inverted_index key must be a str")
+        if not isinstance(key, basestring):
+            raise ValueError("resolved_inverted_index key must be a basestring")
         if not isinstance(val, set):
             raise ValueError("resolved_inverted_index value must be a set")
         return dict.__setitem__(self, key, val)
 
     def add(self, word_str, document_url):
-        if not isinstance(word_str, str):
-            raise ValueError("word_str must be a str")
-        if not isinstance(document_url, str):
-            raise ValueError("document_url must be a str")
+        if not isinstance(word_str, basestring):
+            raise ValueError("word_str must be a basestring")
+        if not isinstance(document_url, basestring):
+            raise ValueError("document_url must be a basestring")
 
         if word_str in self:
             self[word_str].add(document_url)

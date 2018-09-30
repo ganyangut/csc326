@@ -33,3 +33,15 @@ database framework:
 
     _doc_id_cache
         dict {document url: document id}
+
+
+Questions:
+    ASCII/Unicode
+    inverted index key: 1 or '1'
+
+TODO: 
+    links
+    dest_url title short_description
+
+test:
+    csc326/backend$ python crawler.py

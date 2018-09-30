@@ -53,7 +53,7 @@ class crawler(object):
         self.document_index = document_index()
         self.inverted_index = inverted_index()
         self.resolved_inverted_index = resolved_inverted_index()
-        self.lexicon = lexicon()
+        self.lexicon = { }
 
         # functions to call when entering and exiting specific tags
         self._enter = defaultdict(lambda *a, **ka: self._visit_ignore)
@@ -144,7 +144,7 @@ class crawler(object):
         ret_id = self._next_word_id
         self._next_word_id += 1
 
-        # add word to lexicon
+        # add word to lexicon        
         self.lexicon[ret_id] = word
         # add (word id, font size) to current words list
         self._curr_words.append((ret_id, self._font_size))
@@ -210,7 +210,7 @@ class crawler(object):
         print "document title="+ repr(title_text)
 
         # update document title for document id self._curr_doc_id
-        self.document_index[self._curr_doc_id].title = title_text        
+        self.document_index[self._curr_doc_id].title = title_text
     
     def _visit_a(self, elem):
         """Called when visiting <a> tags."""
@@ -230,6 +230,37 @@ class crawler(object):
         self.add_link(self._curr_doc_id, self.document_id(dest_url))
 
         # TODO add title/alt/text to index for destination url
+        #if self._curr_depth == self.depth:
+        socket = None
+        try:
+            socket = urllib2.urlopen(url, timeout=timeout)
+            soup = BeautifulSoup(socket.read())
+            # get text
+            text = soup.getText(separator=u' ')
+            # break into lines and remove leading and trailing space on each
+            lines = (line.strip() for line in text.splitlines())
+            # break multi-head lines
+            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+            # get first 3 non-blank lines                
+            short_description = [ ]
+            line_counter = 0
+            for chunk in chunks:
+                if line_counter > 3:
+                    break
+                if chunk:
+                    if line_counter == 0:
+                        self.document_index[self.document_id(dest_url)].title = chunk
+                    if line_counter > 0:
+                        short_description.append(chunk)
+                    line_counter += 1
+            self.document_index[self.document_id(dest_url)].short_description = "\n".join(short_description)
+        except Exception as e:
+            #print "Exception as e:"
+            print e                
+            pass
+        finally:
+            if socket:
+                socket.close()
     
     def _add_words_to_document(self):
         # knowing self._curr_doc_id and the list of all words and their
@@ -323,6 +354,9 @@ class crawler(object):
 
             url, depth_ = self._url_queue.pop()
 
+            #print url
+            #print depth_
+
             # skip this url; it's too deep
             if depth_ > depth:
                 continue
@@ -335,6 +369,9 @@ class crawler(object):
 
             seen.add(doc_id) # mark this document as haven't been visited
             
+            # record the depth of current document
+            self.document_index[doc_id].depth = self._curr_depth
+
             socket = None
             try:
                 socket = urllib2.urlopen(url, timeout=timeout)
@@ -347,10 +384,30 @@ class crawler(object):
                 self._curr_words = [ ]
                 self._index_document(soup)
                 self._add_words_to_document()
+                
+                # get text
+                text = soup.getText(separator=u' ')
+                # break into lines and remove leading and trailing space on each
+                lines = (line.strip() for line in text.splitlines())
+                # break multi-head lines
+                chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+                # get first 3 non-blank lines                
+                short_description = [ ]
+                line_counter = 0
+                for chunk in chunks:
+                    if line_counter > 3:
+                        break
+                    if chunk:
+                        if line_counter > 0:
+                            short_description.append(chunk)
+                        line_counter += 1
+                self.document_index[self._curr_doc_id].short_description = "\n".join(short_description)                
+                
                 print "    url="+repr(self._curr_url)
 
             except Exception as e:
-                print e
+                #print "Exception as e:"
+                print e                
                 pass
             finally:
                 if socket:
@@ -372,12 +429,35 @@ class crawler(object):
             raise KeyError("doc_id not valid")
         return self.document_index[doc_id].short_description
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     bot = crawler(None, "urls.txt")
-    bot.crawl(depth=1)
-
+    bot.crawl(depth=0)
 
     # code below is for testing
+
+    #bot.crawl(depth=0)
+    
+    #print bot._url_queue
+    #print bot._doc_id_cache
+    #print bot._word_id_cache
+    #print bot.document_index
+    #print bot.inverted_index
+    #print bot.resolved_inverted_index
+    #print bot.lexicon
+    
+    print bot.get_inverted_index()[191]
+    print bot.get_resolved_inverted_index()['github']
+    print bot.get_title(35)
+    print bot.get_short_description(35)
+    
+    print "words: "
+    print bot.document_index[35].words
+    print "links: "
+    print bot.document_index[35].links
+    
+
+
+    '''   
     bot._curr_words = []
     bot.document_id("url: a")
     bot.document_id("url: b")
@@ -394,13 +474,4 @@ if __name__ == "__main__":
     
 
     title = bot.get_title(2)
-    print "title: " +title+ "."
-    #title = bot.get_title(3)
-
-    setex = set([1,2,3])
-    print setex
-    print setex.add(4)
-    print setex
-    print setex.add(1)
-
-    print setex
+    '''
