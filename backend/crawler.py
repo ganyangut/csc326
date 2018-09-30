@@ -146,8 +146,6 @@ class crawler(object):
 
         # add word to lexicon        
         self.lexicon[ret_id] = word
-        # add (word id, font size) to current words list
-        self._curr_words.append((ret_id, self._font_size))
 
         return ret_id
     
@@ -443,17 +441,18 @@ if __name__ == "__main__":
     #print bot.document_index
     #print bot.inverted_index
     #print bot.resolved_inverted_index
-    #print bot.lexicon
+    print "lexicon: "
+    print bot.lexicon
     
-    print bot.get_inverted_index()[191]
-    print bot.get_resolved_inverted_index()['github']
-    print bot.get_title(35)
-    print bot.get_short_description(35)
+    #print bot.get_inverted_index()[191]
+    #print bot.get_resolved_inverted_index()['github']
+    #print bot.get_title(35)
+    #print bot.get_short_description(35)
     
     print "words: "
-    print bot.document_index[35].words
-    print "links: "
-    print bot.document_index[35].links
+    print bot.document_index[1].words
+    #print "links: "
+    #print bot.document_index[35].links
     
 
 

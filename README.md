@@ -38,6 +38,7 @@ database framework:
 Questions:
     ASCII/Unicode
     inverted index key: 1 or '1'
+    how to submit test cases
 
 TODO: 
     links
