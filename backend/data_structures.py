@@ -68,7 +68,7 @@ class document_index(OrderedDict):
 
 class document():    
     
-    def __init__(self, url="", depth=0, title="", short_description="", words=None, links={ }):
+    def __init__(self, url="", depth=0, title="", short_description="", words=None, links=None):
         if not isinstance(url, basestring):
             raise ValueError("document url must be a basestring")
         if not isinstance(depth, int):

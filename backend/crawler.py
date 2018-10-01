@@ -195,12 +195,13 @@ class crawler(object):
     def add_link(self, from_doc_id, to_doc_id):
         """Add a link into the database, or increase the number of links between
         two pages in the database."""
+        if self.document_index[from_doc_id].links == None:
+            self.document_index[from_doc_id].links = { }
         # if the link exists in the db, increase the number
         if to_doc_id in self.document_index[from_doc_id].links:
-            self.document_index[from_doc_id].links[to_doc_id] += 1
-        
-        # if the link doesn't exist in the db, add it
-        self.document_index[from_doc_id].links[to_doc_id] = 1
+            self.document_index[from_doc_id].links[to_doc_id] += 1 
+        else: # if the link doesn't exist in the db, add it
+            self.document_index[from_doc_id].links[to_doc_id] = 1
 
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
@@ -429,30 +430,30 @@ class crawler(object):
 
 if __name__ == "__main__":    
     bot = crawler(None, "urls.txt")
-    bot.crawl(depth=0)
+    bot.crawl(depth=1)
 
     # code below is for testing
 
     #bot.crawl(depth=0)
     
     #print bot._url_queue
-    #print bot._doc_id_cache
+    print bot._doc_id_cache
     #print bot._word_id_cache
     #print bot.document_index
     #print bot.inverted_index
     #print bot.resolved_inverted_index
-    print "lexicon: "
-    print bot.lexicon
+    #print "lexicon: "
+    #print bot.lexicon
     
     #print bot.get_inverted_index()[191]
     #print bot.get_resolved_inverted_index()['github']
     #print bot.get_title(35)
     #print bot.get_short_description(35)
     
-    print "words: "
-    print bot.document_index[1].words
-    #print "links: "
-    #print bot.document_index[35].links
+    #print "words: "
+    #print bot.document_index[1].words
+    print "links: "
+    print bot.document_index[35].links
     
 
 
