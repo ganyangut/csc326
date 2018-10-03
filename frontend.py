@@ -1,7 +1,7 @@
 import Queue
 import operator
 from backend.data_structures import history
-from bottle import Bottle, route, run, template, get, post, request
+from bottle import Bottle, route, run, template, get, post, request,static_file
 
 
 # declare golbal variables
@@ -11,16 +11,18 @@ history = history()
 # ask for keywords from user 
 @get('/') # or @route('/')
 def submit_form():
-    return '''
-        <form action="/" method="post">
-            <input name="keywords" type="text" />            
-            <input value="Search" type="submit" />
-        </form>
-    '''
+    return template('./templates/home_page.tpl')
 
+@route('/assets/image/<filename:path>')
+def send_images(filename):
+    return static_file(filename, root='./assets/image')
 
-@route('/static/<filename:path>')
-def send_static(filename):
+@route('/assets/css/<filename:path>')
+def send_assets(filename):
+    return static_file(filename, root='./assets/css')
+
+@route('/templates/<filename:path>')
+def send_templates(filename):
     return static_file(filename, root='./templates')
 
 
