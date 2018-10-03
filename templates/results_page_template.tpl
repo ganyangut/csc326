@@ -10,8 +10,13 @@
 
 <body>
 
+<form action="/" method="post">
+    <input id="input_box" name="keywords" type="text" placeholder=" Search keywords">            
+    <input id="search_button" value="Search" type="submit">
+</form>
+
 <div id="content">
-        <h1> <font id="font1">Search for </font> <font id="keyword_font">"{{keywords}}" </font> </h1>
+        <h1> <a id="font1">Search for </a> <a id="keyword_font">"{{keywords}}" </a> </h1>
 
 % if len(words_count) > 1:
 <table id=”results”>
