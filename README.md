@@ -2,8 +2,8 @@
 a search engine project
 
 
-database framework:
-
+  database framework:
+  
     document index # that keeps information about each document
         dict {document id: document}
 
@@ -57,23 +57,23 @@ database framework:
 
 
 http://dsrg.utoronto.ca/csc467/midterm/midterm11.pdf
-Traceback (most recent call last):
-  File "crawler.py", line 444, in <module>
-    bot.crawl(depth=1)
-  File "crawler.py", line 384, in crawl
-    soup = BeautifulSoup(socket.read())
-  File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1522, in __init__
-    BeautifulStoneSoup.__init__(self, *args, **kwargs)
-  File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1147, in __init__
-    self._feed(isHTML=isHTML)
-  File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1189, in _feed
-    SGMLParser.feed(self, markup)
-  File "/usr/lib/python2.7/sgmllib.py", line 104, in feed
-    self.goahead(0)
-  File "/usr/lib/python2.7/sgmllib.py", line 143, in goahead
-    k = self.parse_endtag(i)
-  File "/usr/lib/python2.7/sgmllib.py", line 320, in parse_endtag
-    self.finish_endtag(tag)
-  File "/usr/lib/python2.7/sgmllib.py", line 358, in finish_endtag
-    method = getattr(self, 'end_' + tag)
-UnicodeEncodeError: 'ascii' codec can't encode character u'\xed' in position 4: ordinal not in range(128)
+  Traceback (most recent call last):
+    File "crawler.py", line 444, in <module>
+      bot.crawl(depth=1)
+    File "crawler.py", line 384, in crawl
+      soup = BeautifulSoup(socket.read())
+    File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1522, in __init__
+      BeautifulStoneSoup.__init__(self, *args, **kwargs)
+    File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1147, in __init__
+      self._feed(isHTML=isHTML)
+    File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1189, in _feed
+      SGMLParser.feed(self, markup)
+    File "/usr/lib/python2.7/sgmllib.py", line 104, in feed
+      self.goahead(0)
+    File "/usr/lib/python2.7/sgmllib.py", line 143, in goahead
+      k = self.parse_endtag(i)
+    File "/usr/lib/python2.7/sgmllib.py", line 320, in parse_endtag
+      self.finish_endtag(tag)
+    File "/usr/lib/python2.7/sgmllib.py", line 358, in finish_endtag
+      method = getattr(self, 'end_' + tag)
+  UnicodeEncodeError: 'ascii' codec can't encode character u'\xed' in position 4: ordinal not in range(128)
