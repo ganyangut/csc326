@@ -25,6 +25,7 @@ from BeautifulSoup import *
 from collections import defaultdict
 from data_structures import *
 import re
+import unicodedata
 
 def attr(elem, attr):
     """An html attribute from an html element. E.g. <a href="">, then
@@ -118,6 +119,8 @@ class crawler(object):
         self._font_size = 0
         self._curr_words = None
 
+        self.depth = 0
+
         # get all urls into the queue
         try:
             with open(url_file, 'r') as f:
@@ -190,7 +193,12 @@ class crawler(object):
         # compute the new url based on import 
         curr_url = urlparse.urldefrag(curr_url)[0]
         parsed_url = urlparse.urlparse(curr_url)
-        return urlparse.urljoin(parsed_url.geturl(), rel)
+        fixed_url = urlparse.urljoin(parsed_url.geturl(), rel)
+        try:
+            fixed_url = unicodedata.normalize('NFKD', fixed_url).encode('ascii','ignore')
+        finally:
+            return fixed_url
+
 
     def add_link(self, from_doc_id, to_doc_id):
         """Add a link into the database, or increase the number of links between
@@ -206,6 +214,9 @@ class crawler(object):
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
+
+        title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
+
         print "document title="+ repr(title_text)
 
         # update document title for document id self._curr_doc_id
@@ -215,6 +226,11 @@ class crawler(object):
         """Called when visiting <a> tags."""
 
         dest_url = self._fix_url(self._curr_url, attr(elem,"href"))
+
+        skip = False
+        # if dest_url has been visited, no need to add title again
+        if dest_url in self._doc_id_cache:
+            skip = True
 
         #print "href="+repr(dest_url), \
         #      "title="+repr(attr(elem,"title")), \
@@ -226,16 +242,14 @@ class crawler(object):
         
         # add a link entry into the database from the current document to the
         # other document
-        self.add_link(self._curr_doc_id, self.document_id(dest_url))
-
-        # TODO add title/alt/text to index for destination url
-        #if self._curr_depth == self.depth:
-        socket = None
-        try:
-            socket = urllib2.urlopen(url, timeout=timeout)
-            soup = BeautifulSoup(socket.read())
+        self.add_link(self._curr_doc_id, self.document_id(dest_url))        
+        
+        # add depth and title/alt/text to index for destination url
+        if self._curr_depth > self.depth and not skip:
+            self.document_index[self.document_id(dest_url)].depth = self._curr_depth
             # get text
-            text = soup.getText(separator=u' ')
+            text = attr(elem,"title") + attr(elem,"alt") + self._text_of(elem)
+            text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
             # break into lines and remove leading and trailing space on each
             lines = (line.strip() for line in text.splitlines())
             # break multi-head lines
@@ -244,23 +258,13 @@ class crawler(object):
             short_description = [ ]
             line_counter = 0
             for chunk in chunks:
-                if line_counter > 3:
+                if line_counter >= 3:
                     break
                 if chunk:
-                    if line_counter == 0:
-                        self.document_index[self.document_id(dest_url)].title = chunk
-                    if line_counter > 0:
-                        short_description.append(chunk)
+                    short_description.append(chunk)
                     line_counter += 1
-            self.document_index[self.document_id(dest_url)].short_description = "\n".join(short_description)
-        except Exception as e:
-            #print "Exception as e:"
-            print e                
-            pass
-        finally:
-            if socket:
-                socket.close()
-    
+            self.document_index[self.document_id(dest_url)].title = "\n".join(short_description)
+            
     def _add_words_to_document(self):
         # knowing self._curr_doc_id and the list of all words and their
         # font sizes (in self._curr_words), add all the words into the
@@ -286,6 +290,7 @@ class crawler(object):
             word = word.strip()
             if word in self._ignored_words:
                 continue
+            word = unicodedata.normalize('NFKD', word).encode('ascii','ignore')
             self._curr_words.append((self.word_id(word), self._font_size))
         
     def _text_of(self, elem):
@@ -346,15 +351,17 @@ class crawler(object):
                 self._add_text(tag)
 
     def crawl(self, depth=2, timeout=3):
+        
+        self.depth = depth
+        
         """Crawl the web!"""
         seen = set()
-
+        
         while len(self._url_queue):
 
             url, depth_ = self._url_queue.pop()
 
-            #print url
-            #print depth_
+            
 
             # skip this url; it's too deep
             if depth_ > depth:
@@ -369,7 +376,7 @@ class crawler(object):
             seen.add(doc_id) # mark this document as haven't been visited
             
             # record the depth of current document
-            self.document_index[doc_id].depth = self._curr_depth
+            self.document_index[doc_id].depth = depth_
 
             socket = None
             try:
@@ -386,6 +393,7 @@ class crawler(object):
                 
                 # get text
                 text = soup.getText(separator=u' ')
+                text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
                 # break into lines and remove leading and trailing space on each
                 lines = (line.strip() for line in text.splitlines())
                 # break multi-head lines
@@ -403,15 +411,17 @@ class crawler(object):
                 self.document_index[self._curr_doc_id].short_description = "\n".join(short_description)                
                 
                 print "    url="+repr(self._curr_url)
-
+            
             except Exception as e:
-                #print "Exception as e:"
+                print "Exception as e:"
+                print "url: " + url
+                print "depth: " + str(depth_)
                 print e                
                 pass
             finally:
                 if socket:
                     socket.close()
-    
+            
     def get_inverted_index(self):
         return self.inverted_index
 
@@ -437,9 +447,9 @@ if __name__ == "__main__":
     #bot.crawl(depth=0)
     
     #print bot._url_queue
-    print bot._doc_id_cache
+    #print bot._doc_id_cache
     #print bot._word_id_cache
-    #print bot.document_index
+    print bot.document_index
     #print bot.inverted_index
     #print bot.resolved_inverted_index
     #print "lexicon: "
@@ -452,8 +462,8 @@ if __name__ == "__main__":
     
     #print "words: "
     #print bot.document_index[1].words
-    print "links: "
-    print bot.document_index[35].links
+    #print "links: "
+    #print bot.document_index[35].links
     
 
 

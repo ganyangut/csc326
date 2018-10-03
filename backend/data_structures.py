@@ -86,7 +86,10 @@ class document():
 
     # TODO improve this
     def __repr__(self):
-        return ", ".join([self.url, str(self.depth), self.title, self.short_description])
+        if self.words and self.links:
+            return ", ".join([self.url, str(self.depth), self.title, self.short_description, str(len(self.words)), str(len(self.links))])
+        else:
+            return ", ".join([self.url, str(self.depth), self.title, self.short_description, "", ""])
 '''
 class words(list):    
     
