@@ -2,37 +2,37 @@
 a search engine project
 
 
-  database framework:
-  
-    document index # that keeps information about each document
-        dict {document id: document}
+    database framework:
 
-        document
-            list [url, depth, title, short_description, words, links]
+      document index # that keeps information about each document
+          dict {document id: document}
 
-            words
-                list [word]
-    
-                word
-                    tuple (word id, font size)
+          document
+              list [url, depth, title, short_description, words, links]
 
-            links
-                dict {to_doc_id: number of links}                
+              words
+                  list [word]
+      
+                  word
+                      tuple (word id, font size)
 
-    lexicon # keeps a list of words
-        dict {word id: word string}
+              links
+                  dict {to_doc_id: number of links}                
 
-    inverted index # that returns a list of document Ids given a word id
-        dict {word id: set([document id0, document id1, document id2, ..., ])}
+      lexicon # keeps a list of words
+          dict {word id: word string}
 
-    resolved inverted index # that returns a list of document urls given a word string
-        dict {word string: set([document url0, document url1, document url2, ..., ])}
+      inverted index # that returns a list of document Ids given a word id
+          dict {word id: set([document id0, document id1, document id2, ..., ])}
 
-    _word_id_cache
-        dict {word string: word id}
+      resolved inverted index # that returns a list of document urls given a word string
+          dict {word string: set([document url0, document url1, document url2, ..., ])}
 
-    _doc_id_cache
-        dict {document url: document id}
+      _word_id_cache
+          dict {word string: word id}
+
+      _doc_id_cache
+          dict {document url: document id}
 
 
 * Questions:
@@ -57,23 +57,23 @@ a search engine project
 
 
 http://dsrg.utoronto.ca/csc467/midterm/midterm11.pdf
-  Traceback (most recent call last):
-    File "crawler.py", line 444, in <module>
-      bot.crawl(depth=1)
-    File "crawler.py", line 384, in crawl
-      soup = BeautifulSoup(socket.read())
-    File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1522, in __init__
-      BeautifulStoneSoup.__init__(self, *args, **kwargs)
-    File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1147, in __init__
-      self._feed(isHTML=isHTML)
-    File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1189, in _feed
-      SGMLParser.feed(self, markup)
-    File "/usr/lib/python2.7/sgmllib.py", line 104, in feed
-      self.goahead(0)
-    File "/usr/lib/python2.7/sgmllib.py", line 143, in goahead
-      k = self.parse_endtag(i)
-    File "/usr/lib/python2.7/sgmllib.py", line 320, in parse_endtag
-      self.finish_endtag(tag)
-    File "/usr/lib/python2.7/sgmllib.py", line 358, in finish_endtag
-      method = getattr(self, 'end_' + tag)
-  UnicodeEncodeError: 'ascii' codec can't encode character u'\xed' in position 4: ordinal not in range(128)
+    Traceback (most recent call last):
+      File "crawler.py", line 444, in <module>
+        bot.crawl(depth=1)
+      File "crawler.py", line 384, in crawl
+        soup = BeautifulSoup(socket.read())
+      File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1522, in __init__
+        BeautifulStoneSoup.__init__(self, *args, **kwargs)
+      File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1147, in __init__
+        self._feed(isHTML=isHTML)
+      File "/usr/lib/python2.7/dist-packages/BeautifulSoup.py", line 1189, in _feed
+        SGMLParser.feed(self, markup)
+      File "/usr/lib/python2.7/sgmllib.py", line 104, in feed
+        self.goahead(0)
+      File "/usr/lib/python2.7/sgmllib.py", line 143, in goahead
+        k = self.parse_endtag(i)
+      File "/usr/lib/python2.7/sgmllib.py", line 320, in parse_endtag
+        self.finish_endtag(tag)
+      File "/usr/lib/python2.7/sgmllib.py", line 358, in finish_endtag
+        method = getattr(self, 'end_' + tag)
+    UnicodeEncodeError: 'ascii' codec can't encode character u'\xed' in position 4: ordinal not in range(128)
