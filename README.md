@@ -41,8 +41,15 @@ Questions:
     how to submit test cases
 
 TODO: 
-    links
-    dest_url title short_description
+    frontend fix
+    some unicode remaining
+    self.depth necessary or not
+    document repr method
 
 test:
     csc326/backend$ python crawler.py
+
+backup test urls:
+    http://www.eecg.toronto.edu/~csc467/
+    http://www.petergoodman.me/
+    http://dsrg.utoronto.ca/csc467/index.html
