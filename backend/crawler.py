@@ -193,7 +193,12 @@ class crawler(object):
         # compute the new url based on import 
         curr_url = urlparse.urldefrag(curr_url)[0]
         parsed_url = urlparse.urlparse(curr_url)
-        return urlparse.urljoin(parsed_url.geturl(), rel)
+        fixed_url = urlparse.urljoin(parsed_url.geturl(), rel)
+        try:
+            fixed_url = unicodedata.normalize('NFKD', fixed_url).encode('ascii','ignore')
+        finally:
+            return fixed_url
+
 
     def add_link(self, from_doc_id, to_doc_id):
         """Add a link into the database, or increase the number of links between
@@ -209,6 +214,9 @@ class crawler(object):
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
+
+        title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
+
         print "document title="+ repr(title_text)
 
         # update document title for document id self._curr_doc_id
@@ -282,6 +290,7 @@ class crawler(object):
             word = word.strip()
             if word in self._ignored_words:
                 continue
+            word = unicodedata.normalize('NFKD', word).encode('ascii','ignore')
             self._curr_words.append((self.word_id(word), self._font_size))
         
     def _text_of(self, elem):
@@ -402,15 +411,17 @@ class crawler(object):
                 self.document_index[self._curr_doc_id].short_description = "\n".join(short_description)                
                 
                 print "    url="+repr(self._curr_url)
-
+            
             except Exception as e:
-                #print "Exception as e:"
+                print "Exception as e:"
+                print "url: " + url
+                print "depth: " + str(depth_)
                 print e                
                 pass
             finally:
                 if socket:
                     socket.close()
-    
+            
     def get_inverted_index(self):
         return self.inverted_index
 
@@ -429,7 +440,7 @@ class crawler(object):
 
 if __name__ == "__main__":    
     bot = crawler(None, "urls.txt")
-    bot.crawl(depth=0)
+    bot.crawl(depth=1)
 
     # code below is for testing
 
