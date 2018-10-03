@@ -35,25 +35,25 @@ database framework:
         dict {document url: document id}
 
 
-Questions:
-    ASCII/Unicode
-    inverted index key: 1 or '1'
-    how to submit test cases
+* Questions:
+  * ASCII/Unicode
+  * inverted index key: 1 or '1'
+  * how to submit test cases
 
-TODO: 
-    frontend fix
-    some unicode remaining
-    self.depth necessary or not
-    document repr method
-    description line 012 or 123
+* TODO: 
+  * frontend fix
+  * some unicode remaining
+  * self.depth necessary or not
+  * document repr method
+  * description line 012 or 123
 
-test:
-    csc326/backend$ python crawler.py
+* test:
+  * csc326/backend$ python crawler.py
 
-backup test urls:
-    http://www.eecg.toronto.edu/~csc467/
-    http://www.petergoodman.me/
-    http://dsrg.utoronto.ca/csc467/index.html
+* backup test urls:
+  * http://www.eecg.toronto.edu/~csc467/
+  * http://www.petergoodman.me/
+  * http://dsrg.utoronto.ca/csc467/index.html
 
 
 http://dsrg.utoronto.ca/csc467/midterm/midterm11.pdf

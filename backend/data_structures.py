@@ -9,16 +9,17 @@ class history(OrderedDict):
     # the format of each entry is 
     # keyword : (number of times searched, how recent the keyword is saerched)
     # "how recent the keyword is saerched" is recorded in an integer, 1 means most recent, larger number means the keyword is older
-    def add_new_keyword(self, keyword):        
+    def add_new_keywords(self, words_list):        
         # make exsiting keywords old before adding new keyword
         self.make_keywords_old()        
         
-        # the keyword has been searched before
-        if keyword in self:
-            self[keyword] = (self[keyword][0]+1,1)
-        # the keyword has not been searched before        
-        else:
-            self[keyword] = (1,1)        
+        for keyword in words_list:
+            # the keyword has been searched before
+            if keyword in self:
+                self[keyword] = (self[keyword][0]+1,1)
+            # the keyword has not been searched before        
+            else:
+                self[keyword] = (1,1)        
         
         # sort the history after adding new keyword
         self.sort()        
@@ -51,8 +52,7 @@ class history(OrderedDict):
             counter += 1
             if counter >= 20:
                 break
-        return popular.items()            
-
+        return popular.items()
 
 class document_index(OrderedDict):    
     
