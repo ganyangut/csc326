@@ -27,6 +27,8 @@ from data_structures import *
 import re
 import unicodedata
 
+from timeit import default_timer as timer
+
 def attr(elem, attr):
     """An html attribute from an html element. E.g. <a href="">, then
     attr(elem, "href") will get the href or an empty string."""
@@ -118,8 +120,6 @@ class crawler(object):
         self._curr_doc_id = 0
         self._font_size = 0
         self._curr_words = None
-
-        self.depth = 0
 
         # get all urls into the queue
         try:
@@ -245,7 +245,7 @@ class crawler(object):
         self.add_link(self._curr_doc_id, self.document_id(dest_url))        
         
         # add depth and title/alt/text to index for destination url
-        if self._curr_depth > self.depth and not skip:
+        if not skip:
             self.document_index[self.document_id(dest_url)].depth = self._curr_depth
             # get text
             text = attr(elem,"title") + attr(elem,"alt") + self._text_of(elem)
@@ -351,17 +351,12 @@ class crawler(object):
                 self._add_text(tag)
 
     def crawl(self, depth=2, timeout=3):
-        
-        self.depth = depth
-        
         """Crawl the web!"""
         seen = set()
         
         while len(self._url_queue):
 
-            url, depth_ = self._url_queue.pop()
-
-            
+            url, depth_ = self._url_queue.pop()            
 
             # skip this url; it's too deep
             if depth_ > depth:
@@ -402,10 +397,10 @@ class crawler(object):
                 short_description = [ ]
                 line_counter = 0
                 for chunk in chunks:
-                    if line_counter > 3:
+                    if line_counter > 4:
                         break
                     if chunk:
-                        if line_counter > 0:
+                        if line_counter > 1:
                             short_description.append(chunk)
                         line_counter += 1
                 self.document_index[self._curr_doc_id].short_description = "\n".join(short_description)                
@@ -439,8 +434,13 @@ class crawler(object):
         return self.document_index[doc_id].short_description
 
 if __name__ == "__main__":    
+    
+    start = timer()
+
     bot = crawler(None, "urls.txt")
     bot.crawl(depth=1)
+
+    end = timer()
 
     # code below is for testing
 
@@ -449,14 +449,14 @@ if __name__ == "__main__":
     #print bot._url_queue
     #print bot._doc_id_cache
     #print bot._word_id_cache
-    print bot.document_index
+    #print bot.document_index
     #print bot.inverted_index
     #print bot.resolved_inverted_index
     #print "lexicon: "
     #print bot.lexicon
     
-    #print bot.get_inverted_index()[191]
-    #print bot.get_resolved_inverted_index()['github']
+    #print bot.get_inverted_index()
+    #print bot.get_resolved_inverted_index()
     #print bot.get_title(35)
     #print bot.get_short_description(35)
     
@@ -465,7 +465,17 @@ if __name__ == "__main__":
     #print "links: "
     #print bot.document_index[35].links
     
-
+    for doc_id in bot.document_index:
+        #if bot.document_index[doc_id].depth <= 1:
+        print "url: " + bot.document_index[doc_id].url
+        print "depth: " + str(bot.document_index[doc_id].depth)
+        print "title: " + bot.get_title(doc_id)
+        print "description: " + bot.get_short_description(doc_id)
+        #if bot.document_index[doc_id].words:
+        #print bot.document_index[doc_id].words
+        #if bot.document_index[doc_id].links:
+        #print bot.document_index[doc_id].links
+    
 
     '''   
     bot._curr_words = []
@@ -485,3 +495,7 @@ if __name__ == "__main__":
 
     title = bot.get_title(2)
     '''
+
+
+    
+    print(end - start)
