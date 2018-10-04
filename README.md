@@ -34,16 +34,9 @@ a search engine project
       _doc_id_cache
           dict {document url: document id}
 
-
-* Questions:
-  * ASCII/Unicode
-  * inverted index key: 1 or '1'
-  * how to submit test cases
-
 * TODO: 
-  * frontend fix
+  * frontend improve
   * some unicode remaining
-  * self.depth necessary or not
   * document repr method
   * description line 012 or 123
 
@@ -57,6 +50,7 @@ a search engine project
 
 
 http://dsrg.utoronto.ca/csc467/midterm/midterm11.pdf
+    
     Traceback (most recent call last):
       File "crawler.py", line 444, in <module>
         bot.crawl(depth=1)
