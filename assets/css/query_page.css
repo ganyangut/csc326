@@ -1,0 +1,42 @@
+body{
+    background-image: url("../../assets/image/waldoge_original.png");
+    background-size: cover;
+    height: 100%;
+    /*background-position: center;*/
+}
+
+img.title_image{
+    position: relative;
+    width: 20%;
+    height: 20%;
+    top: 200px;
+    left: 450px;
+}
+
+#search_form{
+    height: 100px;
+    width: 700px;
+    text-align: center;
+    margin: 200px;
+    padding: 30px;
+    position: relative;
+}
+
+#input_box{
+    width:  400px;
+    height: 50px;
+    border-radius: 60px;
+    border: 1px solid #cecece;
+    padding: 0px 100px 0px 20px;
+    font-size: 16px;
+
+}
+
+#search_button{
+    border-radius: 60px;
+    width: 140px;
+    height: 48px;
+    font-size: 16px;
+    margin-left: -102px;
+    background-color:  #11acbd;
+}
