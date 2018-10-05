@@ -7,11 +7,10 @@ from bottle import Bottle, route, run, template, get, post, request,static_file
 # declare golbal variables
 history = history()
 
-
 # ask for keywords from user 
 @get('/') # or @route('/')
 def submit_form():
-    return template('./templates/home_page.tpl')
+    return template('./templates/query_page.tpl')
 
 @route('/assets/image/<filename:path>')
 def send_images(filename):
@@ -24,7 +23,6 @@ def send_assets(filename):
 @route('/templates/<filename:path>')
 def send_templates(filename):
     return static_file(filename, root='./templates')
-
 
 # show search results, word count, and search history
 @post('/') # or @route('/', method='POST')
@@ -39,15 +37,9 @@ def show_results():
 
     # add keyword to history
     # joining words instead of the original string to avoid multiple whitespaces
-    history.add_new_keyword(' '.join(words_list))
-
-
-
-    #TEMPLATE_PATH.append('/nfs/ug/homes-0/y/yanggan/csc326/frontend')
-
+    history.add_new_keywords(words_list)
    
-    return template('./templates/results_page_template.tpl', keywords=keywords, words_count=words_count, history=history.get_popular())
-
+    return template('./templates/result_page.tpl', keywords=keywords, words_count=words_count, history=history.get_popular())
 
 # run server
 run(host='localhost', port=8081, debug=True)
