@@ -38,7 +38,7 @@ def show_results():
     # add keyword to history
     # joining words instead of the original string to avoid multiple whitespaces
     history.add_new_keywords(words_list)
-   
+    print "words_count: "+repr(words_count)
     return template('./templates/result_page.tpl', keywords=keywords, words_count=words_count, history=history.get_popular())
 
 # run server

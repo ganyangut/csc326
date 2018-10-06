@@ -4,6 +4,7 @@
 
 <header>
     <meta http-equiv="Content-type" content="text/html"; charset="UTF-8">
+    <link rel="icon" href="./assets/image/icon.ico">
     <title>Our Search Engine. </title>
     <link rel="stylesheet" type="text/css" href="./assets/css/result_page.css">
 </header>
@@ -23,45 +24,45 @@
 
 
 <div class="row">
-    <div class="column">
-       <h2>Words Breakdown</h2>
-        % if len(words_count) > 1:
-        <table id=”results”>
-            <tr id="tr1">
-                <td id="td1">Word</td>
-                <td id="td2">Count</td>
+    % if len(words_count) > 1:
+    <div class="column">    
+        <table id="results">
+            <tr>
+                <th>Words Breakdown</th>
+            <tr>
+            <tr>
+                <th>Word</th>
+                <th>Count</th>
             </tr>
             % for word in words_count:
-            <tr id="tr2">
-                <td id="td1">{{word}}</td>
-                <td id="td2">{{words_count[word]}}</td>
+            <tr>
+                <td>{{word}}</td>
+                <td>{{words_count[word]}}</td>
             </tr>
             %end
         </table>
-        %end
     </div>
-
+    %end
     
-    <div class="column">
     % if history:
-        <h2> Search History</h2>
-        <table id=”history_table”>
-            <tr id="tr1">
-                <td id="td1">Keywords</td>
-                
-                <td id="td2">Times Searched</td>
+    <div class="column">
+        <table id="history">
+            <tr>
+                <th>Search History</th>
+            <tr>
+            <tr>
+                <th>Keywords</th>
+                <th>Times Searched</th>
             </tr>
             % for entry in history:
-            <tr id="tr2">
-                <td id="td1">{{entry[0]}}</td>
-                
-                <td id="td2">{{entry[1][0]}}</td>
+            <tr>
+                <td>{{entry[0]}}</td>                
+                <td>{{entry[1][0]}}</td>
             </tr>
             %end
-        </table>
-        %end
+        </table>    
     </div>
-    
+    %end
 
 </div>
 

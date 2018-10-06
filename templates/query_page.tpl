@@ -2,6 +2,7 @@
 
 <html>
 <header>
+    <link rel="icon" href="./assets/image/icon.ico">
     <title>Our Search Engine. </title>
     <link rel="stylesheet" type="text/css" href="./assets/css/query_page.css">
 </header>
