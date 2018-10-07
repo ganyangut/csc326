@@ -8,7 +8,7 @@ body{
     background: url("../../assets/image/waldoge_1.jpg") no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
-    background-size: 100% 100%;
+    background-size: cover;
     -o-background-size: cover;
 
 }
@@ -38,20 +38,12 @@ div.search_bar{
     background-color:  #11acbd;
 }
 
-#content_col{
-    border: 1px solid #cecece;
-    padding: 30px;
-    margin: 50px 30px 0px 30px;
-
-    float:left;
-    width: 50%;
-    
-}
 
 h1{
     background: linear-gradient(to right, #11acbd , #fff);
     position: relative;
-    top: 230px;
+    top: 200px;
+    left: 30px;
     margin: -5px 15px 20px 10px;
     padding: 3px 30px 3px 20px;
     width: 90%;
@@ -66,8 +58,7 @@ h2{
 div.column{
     float: left;
     width: 40%;
-    padding: 15px;
-    
+    padding: 15px;   
     position: relative;
     top:240px;
     left:30px;
@@ -91,39 +82,24 @@ div.column{
     margin-left: 20px;
 }
 
-#results{
+table{
     margin: 30px;
     border-collapse: collapse;
     text-align: center;
 }
 
-#search_history_col{
-    margin:  50px 30px 0px 30px;
-    padding: 40px;
-    float: left;
-    width: 50%;
-}
-
-#history_table{
-    margin: 10px 30px;
-}
-
-#tr1{
+tr{
     height: 40px;
     background-color: #f1f1f1;
 }
 
-#tr2{
-    height: 40px;
-    background-color: #f1f1f1;
+th{
+    background-color: white;
 }
 
-#td1{
-    border: 1px solid #cecece;
-    width: 300px;
+td{
+    background-color: white;
 }
 
-#td2{
-    border: 1px solid #cecece;
-    width: 300px;
-}
+
+

@@ -34,7 +34,7 @@ class history(OrderedDict):
         for entry in temp:
             self[entry] = temp[entry]
 
-    # add 1 to "how recent the keyword is saerched" for every existing  
+    # add 1 to "how recent the keyword is searched" for every existing  
     def make_keywords_old(self):        
         for keyword in self:
             self[keyword] = (self[keyword][0],self[keyword][1]+1)
