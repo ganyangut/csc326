@@ -464,7 +464,7 @@ if __name__ == "__main__":
     #print bot.document_index[1].words
     #print "links: "
     #print bot.document_index[35].links
-    
+    '''
     for doc_id in bot.document_index:
         #if bot.document_index[doc_id].depth <= 1:
         print "url: " + bot.document_index[doc_id].url
@@ -475,7 +475,7 @@ if __name__ == "__main__":
         #print bot.document_index[doc_id].words
         #if bot.document_index[doc_id].links:
         #print bot.document_index[doc_id].links
-    
+    '''
 
     '''   
     bot._curr_words = []
