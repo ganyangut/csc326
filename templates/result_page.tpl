@@ -24,7 +24,7 @@
 
 
 <div class="row">
-    % if len(words_count) > 1:
+    % if len(words_count) > 1 or next(iter(words_count.values())) > 1:
     <div class="column">    
         <table id="results">
             <tr>
