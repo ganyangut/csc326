@@ -1,47 +1,42 @@
 # csc326
+
 a search engine project
 
+* how to run front end:
+  * in terminal, under lab1_group_20:
+    * ~/lab1_group_20$ python frontend.py
+  * in browser:
+    * localhost:8081
 
-    database framework:
+* how to run tests for backend:
+  * in terminal, under lab1_group_20/backend:
+    * ~/lab1_group_20/backend$ python test.py
 
-      document index # that keeps information about each document
-          dict {document id: document}
+* how to run crawler:
+  * in terminal, under lab1_group_20/backend:
+    * ~/lab1_group_20/backend$ python crawler.py
 
-          document
-              list [url, depth, title, short_description, words, links]
-
-              words
-                  list [word]
-      
-                  word
-                      tuple (word id, font size)
-
-              links
-                  dict {to_doc_id: number of links}                
-
-      lexicon # keeps a list of words
-          dict {word id: word string}
-
-      inverted index # that returns a list of document Ids given a word id
-          dict {word id: set([document id0, document id1, document id2, ..., ])}
-
-      resolved inverted index # that returns a list of document urls given a word string
-          dict {word string: set([document url0, document url1, document url2, ..., ])}
-
-      _word_id_cache
-          dict {word string: word id}
-
-      _doc_id_cache
-          dict {document url: document id}
-
-* TODO: 
-  * frontend improve
-  * some unicode remaining
-  * document repr method
-  * description line 012 or 123
-
-* test:
-  * csc326/backend$ python crawler.py
+* database framework:
+  * document index # that keeps information about each document
+    * dict {document id: document}
+    * document
+      * list [url, depth, title, short_description, words, links]
+      * words
+        * list [word]
+        * word
+          * tuple (word id, font size)
+      * links
+        * dict {to_doc_id: number of links}
+      * lexicon # keeps a list of words
+        * dict {word id: word string}
+      * inverted index # that returns a list of document Ids given a word id
+        * dict {word id: set([document id0, document id1, document id2, ..., ])}
+      * resolved inverted index # that returns a list of document urls given a word string
+        * dict {word string: set([document url0, document url1, document url2, ..., ])}
+      * _word_id_cache
+        * dict {word string: word id}
+      * _doc_id_cache
+        * dict {document url: document id}
 
 * backup test urls:
   * http://www.eecg.toronto.edu/~csc467/

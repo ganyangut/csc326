@@ -48,10 +48,6 @@ class testCrawler(unittest.TestCase):
         key=self.bot.get_inverted_index()[93]
         value= set([1])
         self.assertEqual(key,value)
-        
-
-        
-
 
     def test_resolved_inverted_index(self):
         '''
@@ -68,6 +64,26 @@ class testCrawler(unittest.TestCase):
         self.assertEqual(self.bot.get_resolved_inverted_index()['aided'],set(['http://www.eecg.toronto.edu/']))
         self.assertEqual(self.bot.get_resolved_inverted_index()['limited'],set(['http://www.eecg.toronto.edu/~enright', 'http://www.eecg.utoronto.ca/~ashvin']))
 
+    def test_ids_to_strings(self):        
+        # resolve every word ids and document ids in inverted_index
+        # compare results with resolved_inverted_index        
+
+        #test url:http://www.eecg.toronto.edu/
+        print ("test word and url resolving \n")
+
+        inverted_index = self.bot.get_inverted_index()
+        resolved_inverted_index = self.bot.get_resolved_inverted_index()
+        document_index = self.bot.document_index
+        lexicon = self.bot.lexicon
+
+        for word_id in inverted_index:
+            url_ids = inverted_index[word_id]            
+            urls = set([ ])
+            for url_id in url_ids:
+                urls.add(document_index[url_id].url)            
+            word_str = lexicon[word_id]
+            self.assertEqual(resolved_inverted_index[word_str], urls)        
+        
 
 if __name__ == "__main__":
     unittest.main()

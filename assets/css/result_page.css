@@ -1,22 +1,14 @@
 
 
 body{
-    /*
-    cover page image style referenced from:
-    https://github.com/BlackrockDigital/startbootstrap-the-big-picture/blob/master/css/the-big-picture.css
-    */
     background: url("../../assets/image/waldoge_1.jpg") no-repeat center center fixed;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
     background-size: cover;
-    -o-background-size: cover;
-
 }
 
 div.search_bar{
     position: relative;
     top:100px;
-    left:300px;
+    left:600px;
 }
 
 #input_box{
@@ -62,7 +54,6 @@ div.column{
     top:240px;
     left:30px;
 }
-
 
 @media screen and (max-width:600px) {
     div.column {
