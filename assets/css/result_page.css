@@ -49,10 +49,9 @@ h1{
     width: 90%;
 }
 
-h2{
+h2, h3{
     background-color: white;
 }
-
 
 
 div.column{
@@ -86,6 +85,8 @@ table{
     margin: 30px;
     border-collapse: collapse;
     text-align: center;
+    border: 1px solid black;
+    word-wrap: break-word;
 }
 
 tr{
@@ -93,12 +94,15 @@ tr{
     background-color: #f1f1f1;
 }
 
+
 th{
     background-color: white;
+    border: 1px solid black;
 }
 
 td{
     background-color: white;
+    border-right:1px solid black;
 }
 
 
