@@ -10,7 +10,7 @@
 </header>
 
 <body>
-
+<!-- form with a input box and a search button -->
 <div class="search_bar">
 <form id="search_form" action="/" method="post" >
     <input id="input_box" name="keywords" type="text" placeholder=" Where's waldoge? ">            
@@ -24,12 +24,15 @@
 
 
 <div class="row">
+<!-- if a phrase is submitted, list the number od keywords in the pharse and 
+     the number of apperances for each keyword in the pharse 
+-->
     % if len(words_count) > 1:
     <div class="column">    
         <table id="results">
             <tr>
-                <th>Words Breakdown</th>
-            <tr>
+                <th id="th1" colspan="2" style="font-size:20px">Words Breakdown</th>
+            </tr> 
             <tr>
                 <th>Word</th>
                 <th>Count</th>
@@ -43,13 +46,16 @@
         </table>
     </div>
     %end
-    
+<!--Display the top 20 keywords on the query page, 
+    and the total number of times that these words have been searched.
+-->
     % if history:
     <div class="column">
+            
         <table id="history">
             <tr>
-                <th>Search History</th>
-            <tr>
+                <th colspan="2" style="font-size:20px">Search History</th>
+            </tr>
             <tr>
                 <th>Keywords</th>
                 <th>Times Searched</th>
