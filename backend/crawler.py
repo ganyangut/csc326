@@ -157,16 +157,16 @@ class crawler(object):
         if word in self._word_id_cache:
             word_id = self._word_id_cache[word]
         else:
+            # 1) add the word to the lexicon, if that fails, then the
+            #    word is in the lexicon
+            # 2) query the lexicon for the id assigned to this word, 
+            #    store it in the word id cache, and return the id.
             word_id = self._insert_word(word)
             self._word_id_cache[word] = word_id
         
+        # add the word to inverted index and resolved inverted index
         self.inverted_index.add(word_id, self._curr_doc_id)
-        self.resolved_inverted_index.add(word, self._curr_url)
-
-        # 1) add the word to the lexicon, if that fails, then the
-        #    word is in the lexicon
-        # 2) query the lexicon for the id assigned to this word, 
-        #    store it in the word id cache, and return the id.
+        self.resolved_inverted_index.add(word, self._curr_url)        
         
         return word_id
     
@@ -199,7 +199,6 @@ class crawler(object):
         finally:
             return fixed_url
 
-
     def add_link(self, from_doc_id, to_doc_id):
         """Add a link into the database, or increase the number of links between
         two pages in the database."""
@@ -214,7 +213,7 @@ class crawler(object):
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
-
+        # change unicode string to ascii string
         title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
 
         print "document title="+ repr(title_text)
@@ -249,6 +248,7 @@ class crawler(object):
             self.document_index[self.document_id(dest_url)].depth = self._curr_depth
             # get text
             text = attr(elem,"title") + attr(elem,"alt") + self._text_of(elem)
+            # change unicode string to ascii string
             text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
             # break into lines and remove leading and trailing space on each
             lines = (line.strip() for line in text.splitlines())
@@ -290,6 +290,7 @@ class crawler(object):
             word = word.strip()
             if word in self._ignored_words:
                 continue
+            # change unicode string to ascii string
             word = unicodedata.normalize('NFKD', word).encode('ascii','ignore')
             self._curr_words.append((self.word_id(word), self._font_size))
         
@@ -298,8 +299,7 @@ class crawler(object):
         if isinstance(elem, Tag):
             text = [ ]
             for sub_elem in elem:
-                text.append(self._text_of(sub_elem))
-            
+                text.append(self._text_of(sub_elem))            
             return " ".join(text)
         else:
             return elem.string

@@ -54,6 +54,8 @@ class history(OrderedDict):
                 break
         return popular.items()
 
+# key is document id
+# value is document
 class document_index(OrderedDict):    
     
     def __init__(self):
@@ -66,6 +68,7 @@ class document_index(OrderedDict):
             raise ValueError("document_index value must be a document")
         return OrderedDict.__setitem__(self, key, val)
 
+# a data structure for each entry in the document index
 class document():    
     
     def __init__(self, url="", depth=0, title="", short_description="", words=None, links=None):
@@ -84,33 +87,14 @@ class document():
         self.words = words
         self.links = links
 
-    # TODO improve this
     def __repr__(self):
         if self.words and self.links:
             return ", ".join([self.url, str(self.depth), self.title, self.short_description, str(len(self.words)), str(len(self.links))])
         else:
             return ", ".join([self.url, str(self.depth), self.title, self.short_description, "", ""])
-'''
-class words(list):    
-    
-    def __init__(self):
-        list.__init__(self)
 
-    def __setitem__(self, val):
-        if not isinstance(val, word):
-            raise ValueError("words value must be a word")
-        return list.__setitem__(self, val)
-
-class word(tuple):    
-    
-    def __init__(self, word_id, font_size):
-        tuple.__init__(self)
-
-    def __setitem__(self, val):
-        if not isinstance(val, word):
-            raise ValueError("words value must be a word")
-        return list.__setitem__(self, val)
-'''
+# key is destination url id
+# value is how many times we see this link
 class links_(dict):    
     
     def __init__(self):
@@ -123,6 +107,8 @@ class links_(dict):
             raise ValueError("links_ value must be an int")
         return dict.__setitem__(self, key, val)
 
+# key is word id
+# value is word string
 class lexicon(dict):    
     
     def __init__(self):
@@ -135,6 +121,8 @@ class lexicon(dict):
             raise ValueError("lexicon value must be a basestring")
         return dict.__setitem__(self, key, val)
 
+# key is word id
+# value is as set of document ids
 class inverted_index(dict):    
     
     def __init__(self):
@@ -158,6 +146,8 @@ class inverted_index(dict):
         else:
             self[word_id] = set([document_id])
 
+# key is word string
+# value is as set of document urls
 class resolved_inverted_index(dict):    
     
     def __init__(self):
