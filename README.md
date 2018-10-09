@@ -4,17 +4,17 @@ a search engine project
 
 * how to run front end:
   * in terminal, under lab1_group_20:
-    * python frontend.py
+    * ~/lab1_group_20$ python frontend.py
   * in browser:
     * localhost:8081
 
 * how to run tests for backend:
   * in terminal, under lab1_group_20/backend:
-    * python test.py
+    * ~/lab1_group_20/backend$ python test.py
 
 * how to run crawler:
   * in terminal, under lab1_group_20/backend:
-    * python crawler.py
+    * ~/lab1_group_20/backend$ python crawler.py
 
 * database framework:
   * document index # that keeps information about each document
