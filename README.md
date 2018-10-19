@@ -58,6 +58,10 @@ a search engine project
 
   can be triggered with too many requests, try to clear cookie first 
 
+* TODO:
+  1. lab requirments
+  2. empty global variables
+  3. style
 
 http://dsrg.utoronto.ca/csc467/midterm/midterm11.pdf
     
