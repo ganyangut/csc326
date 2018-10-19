@@ -43,6 +43,21 @@ a search engine project
   * http://www.petergoodman.me/
   * http://dsrg.utoronto.ca/csc467/index.html
 
+* install module:
+  * oauth2client: pip install --upgrade oauth2client
+  * beaker.middleware: pip install beaker
+  * Google API client: pip install google-api-clinet (this should also install    httplib2, if not: pip install httplib2)
+
+* to be solved problem, occur randomly
+  Error: 500 Internal Server Error
+  Sorry, the requested URL 'http://localhost:8081/redirect?code=4/dwDjxXw4eCWPT-VbpKgY6mUTSZO5qKIyXGb5q9-RcsyW9FJBDJqO-rJtyF0lxVhArz-X5YVfMJDXvaOqrC7c0lc&scope=https://www.googleapis.com/auth/plus.me+https://www.googleapis.com/auth/userinfo.email' caused an error:
+
+  Internal Server Error
+  Exception:
+  FlowExchangeError('invalid_grantBad Request',)
+
+  can be triggered with too many requests, try to clear cookie first 
+
 
 http://dsrg.utoronto.ca/csc467/midterm/midterm11.pdf
     

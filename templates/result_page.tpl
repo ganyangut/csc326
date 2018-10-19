@@ -7,9 +7,26 @@
     <link rel="icon" href="./assets/image/icon.ico">
     <title>{{keywords}} - Waldoge Search</title>
     <link rel="stylesheet" type="text/css" href="./assets/css/result_page.css">
+     <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 </header>
 
 <body>
+    <!-- if user has not logged in, display the log_in button -->
+    % if login == False:
+    <form id="login_form" action="/login/result" method="get">
+        <input id="login_button" value="Log in" type="submit">
+    </form>
+    <!-- if user has logged in, display the user email, user name... -->
+    %else:
+    <form id="login_form">
+        <button id="user_name" type="button" class="btn btn-info btn-lg" 
+                data-toggle="modal" data-target="#logout_modal">{{user_name}}</button>
+    </form>
+    %end
+
     <!-- form with a input box and a search button -->
     <div class="search_bar">
         <form id="search_form" action="/" method="post" >
@@ -47,7 +64,7 @@
         <!--Display the top 20 keywords on the query page, 
             and the total number of times that these words have been searched.
         -->
-        % if history:
+        % if login and history:
         <div class="column">                
             <table id="history">
                 <tr>
@@ -67,6 +84,30 @@
         </div>
         %end
     </div>
+
+
+     <!-- log out modal --> 
+    <form action="/logout" method="get">
+    <div class="modal" id="logout_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{user_name}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{user_email}}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Sign out</button>
+      </div>
+    </div>
+    </div>
+    </div>
+    </form>
 </body>
 
 </html>

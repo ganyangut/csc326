@@ -5,6 +5,25 @@ body{
     background-size: cover;
 }
 
+#login_form{
+    top: 0px;
+    right: 20px;
+    height: 80px;
+    text-align: right;
+    position: relative;
+}
+
+#login_button{
+    border-radius: 60px;
+    width: 70px;
+    height: 40px;
+    font-size: 14px;
+    margin-left: -102px;
+    background-color:  #11acbd;
+}
+#user_name{
+    border-radius: 90px;
+}
 div.search_bar{
     position: relative;
     top:100px;
