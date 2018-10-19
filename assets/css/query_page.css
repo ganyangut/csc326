@@ -13,6 +13,25 @@ img.title_image{
     left: 450px;
 }
 
+#login_form{
+    top: 0px;
+    right: 20px;
+    height: 80px;
+    text-align: right;
+    position: relative;
+}
+
+#login_button{
+    border-radius: 60px;
+    width: 70px;
+    height: 40px;
+    font-size: 14px;
+    margin-left: -102px;
+    background-color:  #11acbd;
+}
+#user_name{
+    border-radius: 90px;
+}
 #search_form{
     height: 100px;
     width: 700px;
