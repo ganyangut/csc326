@@ -13,6 +13,6 @@ pip install --upgrade oauth2client
 #beaker.middleware: 
 pip install beaker
 #Google API client: (this should also install    httplib2, if not: pip install httplib2)
-pip install google-api-clinet
+pip install --upgrade google-api-python-client
 
 #
