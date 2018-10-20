@@ -46,7 +46,17 @@ a search engine project
 * install module:
   * oauth2client: pip install --upgrade oauth2client
   * beaker.middleware: pip install beaker
-  * Google API client: pip install google-api-clinet (this should also install    httplib2, if not: pip install httplib2)
+  * Google API client: pip install google-api-clinet (this should also install httplib2, if not: pip install httplib2)
+  * install boto: pip install boto
+  * install awscli: pip install awscli
+
+* add awscli path to your $PATH:
+  * import awecli in a python file
+  * print awecli.__path__
+  * edit ~/.bashrc 
+  * add a line: export PATH=$PATH:<your_local_path>
+
+
 
 * to be solved problem, occur randomly
   Error: 500 Internal Server Error
