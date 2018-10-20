@@ -52,11 +52,9 @@ a search engine project
 
 * add awscli path to your $PATH:
   * import awecli in a python file
-  * print awecli.\__path__
+  * print awecli.\_\_path\_\_
   * edit ~/.bashrc 
   * add a line: export PATH=$PATH:<your_local_path>
-
-
 
 * to be solved problem, occur randomly
   Error: 500 Internal Server Error
