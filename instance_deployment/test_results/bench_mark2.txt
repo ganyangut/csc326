@@ -1,0 +1,54 @@
+gan@gan-ubuntu:~/csc326$ ab -n 1000 -c 50 http://52.207.153.98:80/?keywords=helloworld+foo+bar
+This is ApacheBench, Version 2.3 <$Revision: 1807734 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 52.207.153.98 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        WSGIServer/0.1
+Server Hostname:        52.207.153.98
+Server Port:            80
+
+Document Path:          /?keywords=helloworld+foo+bar
+Document Length:        2400 bytes
+
+Concurrency Level:      50
+Time taken for tests:   7.246 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      2559000 bytes
+HTML transferred:       2400000 bytes
+Requests per second:    138.01 [#/sec] (mean)
+Time per request:       362.280 [ms] (mean)
+Time per request:       7.246 [ms] (mean, across all concurrent requests)
+Transfer rate:          344.90 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       58  156 136.9    133    3362
+Processing:    67  201 277.0    141    3329
+Waiting:       67  195 249.7    139    3329
+Total:        175  357 308.6    287    3590
+
+Percentage of the requests served within a certain time (ms)
+  50%    287
+  66%    319
+  75%    343
+  80%    382
+  90%    480
+  95%    605
+  98%   1270
+  99%   1852
+ 100%   3590 (longest request)

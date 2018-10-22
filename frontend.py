@@ -22,7 +22,7 @@ keywords  = ''
 words_count = []
 
 SCOPE = 'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email'
-REDIRECT_URI = 'http://localhost:8081/redirect'
+REDIRECT_URI = 'http://localhost:80/redirect'
 sessions_opts = {
     'session.type': 'file',
     'session.cookie_expires': 300,
@@ -191,4 +191,4 @@ def send_templates(filename):
 if __name__ == "__main__":
     app = SessionMiddleware(app(), sessions_opts)
     # run server
-    run(app=app, host='localhost', port=8081, debug=True)
+    run(app=app, host='localhost', port=80, debug=True)

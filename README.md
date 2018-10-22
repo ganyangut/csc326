@@ -2,6 +2,62 @@
 
 a search engine project
 
+## Lab 2:
+
+1. install modules:
+  * ~/csc326$ . shell_scripts/install.sh
+
+2. add awscli path to your $PATH:
+  * import awecli in a python file
+  * print awecli.\_\_path\_\_
+  * edit ~/.bashrc 
+  * add a line: export PATH=$PATH:<your_local_path>
+
+3. deploy a instance:
+  * ~/csc326$ cd instance_deployment/
+  * ~/csc326/instance_deployment$ python deploy_instance.py
+
+4. check the information of the instance just started:
+  * ~/csc326/instance_deployment$ python check_running_instance.py
+
+5. connect to the instance:
+  * ~/csc326/instance_deployment$ ssh -i waldoge_key_pair.pem ubuntu@<public_ip_address>
+  * <public_ip_address> should be printed in step 4
+
+6. open another bash shell, copy our program to the instance:
+  * ~/csc326/instance_deployment$ scp -i waldoge_key_pair.pem -r ~/csc326 ubuntu@<public_ip_address>:~/
+
+7. in the instance
+  * ubuntu@ip-<private_ip_address>:~$ . shell_scripts/install.sh
+  * ubuntu@ip-<private_ip_address>:~$ cd csc326
+  * ubuntu@ip-<private_ip_address>:~$ vim frontend.py
+  * inside frontend.py: change localhost to <private_ip_address>
+  * ubuntu@ip-<private_ip_address>:~$ sudo python frontend.py
+
+8. test the web page in a web browser
+  * the url is: <public_ip_address>:80
+
+9. stop all running instances:
+  * ~/csc326/instance_deployment$ python stop_instance.py
+
+
+* to be solved problem, occur randomly
+  Error: 500 Internal Server Error
+  Sorry, the requested URL 'http://localhost:8081/redirect?code=4/dwDjxXw4eCWPT-VbpKgY6mUTSZO5qKIyXGb5q9-RcsyW9FJBDJqO-rJtyF0lxVhArz-X5YVfMJDXvaOqrC7c0lc&scope=https://www.googleapis.com/auth/plus.me+https://www.googleapis.com/auth/userinfo.email' caused an error:
+
+  Internal Server Error
+  Exception:
+  FlowExchangeError('invalid_grantBad Request',)
+
+  can be triggered with too many requests, try to clear cookie first 
+
+* TODO:
+  1. lab requirments
+  2. empty global variables
+  3. style
+
+## Lab 1:
+
 * how to run front end:
   * in terminal, under lab1_group_20:
     * ~/lab1_group_20$ python frontend.py
@@ -42,34 +98,6 @@ a search engine project
   * http://www.eecg.toronto.edu/~csc467/
   * http://www.petergoodman.me/
   * http://dsrg.utoronto.ca/csc467/index.html
-
-* install module:
-  * oauth2client: pip install --upgrade oauth2client
-  * beaker.middleware: pip install beaker
-  * Google API client: pip install google-api-clinet (this should also install httplib2, if not: pip install httplib2)
-  * install boto: pip install boto
-  * install awscli: pip install awscli
-
-* add awscli path to your $PATH:
-  * import awecli in a python file
-  * print awecli.\_\_path\_\_
-  * edit ~/.bashrc 
-  * add a line: export PATH=$PATH:<your_local_path>
-
-* to be solved problem, occur randomly
-  Error: 500 Internal Server Error
-  Sorry, the requested URL 'http://localhost:8081/redirect?code=4/dwDjxXw4eCWPT-VbpKgY6mUTSZO5qKIyXGb5q9-RcsyW9FJBDJqO-rJtyF0lxVhArz-X5YVfMJDXvaOqrC7c0lc&scope=https://www.googleapis.com/auth/plus.me+https://www.googleapis.com/auth/userinfo.email' caused an error:
-
-  Internal Server Error
-  Exception:
-  FlowExchangeError('invalid_grantBad Request',)
-
-  can be triggered with too many requests, try to clear cookie first 
-
-* TODO:
-  1. lab requirments
-  2. empty global variables
-  3. style
 
 http://dsrg.utoronto.ca/csc467/midterm/midterm11.pdf
     
