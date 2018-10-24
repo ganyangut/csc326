@@ -13,16 +13,12 @@ body{
     position: relative;
 }
 
-#login_button{
-    border-radius: 60px;
-    width: 70px;
-    height: 40px;
-    font-size: 14px;
-    margin-left: -102px;
-    background-color:  #11acbd;
-}
-#user_name{
+#login_button, #user_name{
     border-radius: 90px;
+}
+#user_email{
+    border-radius: 90px;
+    font-size: 14px;
 }
 div.search_bar{
     position: relative;
@@ -31,7 +27,7 @@ div.search_bar{
 }
 
 #input_box{
-    width:  400px;
+    width:  450px;
     height: 50px;
     border-radius: 60px;
     border: 1px solid #cecece;

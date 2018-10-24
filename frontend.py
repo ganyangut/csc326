@@ -2,7 +2,7 @@ import Queue
 import operator
 import json
 import httplib2
-from backend.data_structures import history
+from backend.data_structures import user, history
 from bottle import Bottle, route, run, template, get, post, request, static_file, redirect, app
 from oauth2client.client import OAuth2WebServerFlow, flow_from_clientsecrets
 from googleapiclient.errors import HttpError
@@ -12,7 +12,8 @@ from beaker.middleware import SessionMiddleware
 
 # declare golbal variables
 login = False
-history = history()
+user=user()
+user_history = history()
 session = {}
 user_document = {}
 user_email = ''
@@ -35,13 +36,18 @@ sessions_opts = {
 @get('/')  # or @route('/')
 def home():
     print "------route---home------------------------------"
-    global user_name
-    return template('./templates/query_page.tpl', user_name=user_name, user_email=user_email, login=login)
+
+    if login:
+        return template('./templates/query_page.tpl', user_name=user_name, user_email=user_email, 
+                    history=user_history.get_popular(), login=login)
+    else:
+        return template('./templates/query_page.tpl', login=login)
 
 
 # show search results, word count, and search history
 @post('/')  # or @route('/', method='POST')
 def show_results():
+    
     # keyword from http get
     global keywords
     global words_count
@@ -54,11 +60,15 @@ def show_results():
 
     # add keyword to history
     # joining words instead of the original string to avoid multiple whitespaces
-    history.add_new_keywords(words_list)
-    print "words_count: "+repr(words_count)
-    global user_name
-    return template('./templates/result_page.tpl', keywords=keywords, words_count=words_count, 
-    history=history.get_popular(), user_name=user_name, user_email=user_email, login=login)
+    if login:
+        user_history.add_new_keywords(words_list)
+        print "words_count: "+repr(words_count)
+        return template('./templates/result_page.tpl', keywords=keywords, words_count=words_count, 
+            history=user_history.get_popular(), user_name=user_name,
+            user_email=user_email, login=login)
+    else:
+        return template('./templates/result_page.tpl', keywords=keywords,words_count=words_count,login=login)
+        
 
 
 
@@ -89,6 +99,7 @@ def google_logout():
     global login
     login=False
     global session
+    session = request.environ.get('beaker.session')
     session.delete()
     return redirect('/')
 
@@ -126,7 +137,7 @@ def redirect_page():
     http = httplib2.Http()
     http = credentials.authorize(http)
 
-    # Get user email
+    # Get user info
     users_service = build('oauth2', 'v2', http=http)
     global user_document
     user_document = users_service.userinfo().get().execute()
@@ -134,7 +145,15 @@ def redirect_page():
     global user_email
     user_email = user_document['email']
     global user_name
-    user_name = user_document['name']
+    #user_name = user_document['name']
+
+    #if it is a new user, add the user to class
+    global user
+    global user_history
+    user.add_if_new_user(user_email)
+    user_history = user.get_history(user_email)
+
+
     # maintain a session for the user
     global session
     session = request.environ.get('beaker.session')
@@ -149,32 +168,25 @@ def redirect_page():
 @route('/user')
 def user_login():
     print "------route---user------------------------------"
-    global user_name
+    
     global login
-    global current_page
-    global keywords
-    global words_count
-    global user_document
     login = True
-
+    
     if current_page == 'query_page':
-        return template('./templates/query_page.tpl', user_name=user_name, user_email=user_email, login=login)
+        if login:
+            return template('./templates/query_page.tpl', user_name=user_name,
+                     user_email=user_email, history=user_history.get_popular(), login=login)
+        else:
+            return template('./templates/query_page.tpl', login=login)
     else:
-        return template('./templates/result_page.tpl', keywords=keywords, words_count=words_count, 
-        history=history.get_popular(),user_name=user_name, user_email=user_email, login=login)
-'''
-# route of images
-@route('/assets/image/<filename:path>')
-def send_images(filename):
-    return static_file(filename, root='./assets/image')
-
-# route of css files
+        if login:
+            return template('./templates/result_page.tpl', keywords=keywords, words_count=words_count, 
+                    history=user_history.get_popular(),user_name=user_name,
+                    user_email=user_email, login=login)
+        else:
+            return template('./templates/result_page.tpl', keywords=keywords, words_count=words_count, login=login)
 
 
-@route('/assets/css/<filename:path>')
-def send_assets(filename):
-    return static_file(filename, root='./assets/css')
-'''
 # routes of assets (css, js, images)
 @route('/assets/<filename:path>')
 def send_assets(filename):
