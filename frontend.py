@@ -2,6 +2,8 @@ import Queue
 import operator
 import json
 import httplib2
+import beaker
+import requests
 from backend.data_structures import user, history
 from bottle import Bottle, route, run, template, get, post, request, static_file, redirect, app
 from oauth2client.client import OAuth2WebServerFlow, flow_from_clientsecrets
@@ -12,6 +14,7 @@ from beaker.middleware import SessionMiddleware
 
 # declare golbal variables
 login = False
+token = {}
 user=user()
 user_history = history()
 session = {}
@@ -82,12 +85,14 @@ def query_page():
 
 # redirect to Google login prompt for user authentication
 def google_login():
-    print "------route---login------------------------------"
+    print "------route---login------------------------------\n"
     flow = flow_from_clientsecrets('client_secrets.json',
                                    scope=SCOPE,
                                    redirect_uri=REDIRECT_URI)
+    print "login flow: "+repr(flow)+"\n"
 
     uri = flow.step1_get_authorize_url()
+    print "uri: "+ repr(uri)+"\n"
     return redirect(str(uri))
 
 
@@ -98,9 +103,25 @@ def google_logout():
     #TODO: empty gobal variables
     global login
     login=False
+    try:
+        r=requests.post('https://accounts.google.com/o/oauth2/revoke',
+            params={'token': token},
+            headers = {'content-type': 'application/x-www-form-urlencoded'})
+    except expression as identifier:
+            print identifier
+
+
+    print "\n requests.post -- response: " +repr(r)+"\n"
     global session
-    session = request.environ.get('beaker.session')
+    #print "\n environ1: " + repr(request.environ)
+    
+   # session = request.environ.get('beaker.session')
     session.delete()
+    #print session
+    #print "\n environ2: " + repr(request.environ)
+   # session.invalidate()
+
+
     return redirect('/')
 
 #if user login in the result_page, set the current page to result_page
@@ -122,17 +143,21 @@ def redirect_page():
     print "------route---redirect------------------------------"
     code = request.query.get('code', '')
 
+    print "1\n"
     with open("client_secrets.json", 'r') as load_f:
         load_dict = json.load(load_f)
         print "\n client_secrets:"
         print load_dict
+    print "2\n"
     flow = OAuth2WebServerFlow(client_id=load_dict['web']['client_id'], client_secret=load_dict['web']['client_secret'],
                                scope=SCOPE, redirect_uri=REDIRECT_URI)
+    print "3\n"
     credentials = flow.step2_exchange(code)
-
+    print "credentials : \n"+repr(credentials)+"\n"
     # acquire refresh tokens for offline access, syncing Google accounts when users are not actively logged in.
+    global token
     token = credentials.id_token['sub']
-
+    print "\n token: " + repr(token)
     # retrieve user's data
     http = httplib2.Http()
     http = credentials.authorize(http)
@@ -145,7 +170,8 @@ def redirect_page():
     global user_email
     user_email = user_document['email']
     global user_name
-    #user_name = user_document['name']
+    if not user_document['name']:
+        user_name=user_document['name']
 
     #if it is a new user, add the user to class
     global user
@@ -156,11 +182,13 @@ def redirect_page():
 
     # maintain a session for the user
     global session
+    #print "\n environ: " + repr(request.environ)
     session = request.environ.get('beaker.session')
     session['email'] = user_email
     session['user_name'] = user_name
 
     session.save()
+    
     print "\n session: " + repr(session)
     return redirect('/user')
 
@@ -193,8 +221,6 @@ def send_assets(filename):
     return static_file(filename, root='./assets')
 
 # route of templates
-
-
 @route('/templates/<filename:path>')
 def send_templates(filename):
     return static_file(filename, root='./templates')
