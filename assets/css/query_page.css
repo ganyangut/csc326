@@ -21,17 +21,14 @@ img.title_image{
     position: relative;
 }
 
-#login_button{
-    border-radius: 60px;
-    width: 70px;
-    height: 40px;
-    font-size: 14px;
-    margin-left: -102px;
-    background-color:  #11acbd;
-}
-#user_name{
+#login_button, #user_name{
     border-radius: 90px;
 }
+
+#user_email{
+    border-radius: 90px;
+}
+
 #search_form{
     height: 100px;
     width: 700px;
@@ -59,3 +56,19 @@ img.title_image{
     margin-left: -102px;
     background-color:  #11acbd;
 }
+
+table{
+    margin: 30px;
+    border-collapse: collapse;
+    text-align: center;
+    border: 1px solid black;
+    word-wrap: break-word;
+}
+ tr{
+    height: 40px;
+    background-color: #f1f1f1;
+}
+ th{
+    background-color: white;
+    border: 1px solid black;
+} 

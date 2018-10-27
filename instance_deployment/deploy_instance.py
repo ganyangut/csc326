@@ -42,8 +42,8 @@ print resp
 resp = conn.terminate_instances(instance_ids=["i-0bdf82d0e7b7521b4"])
 print resp
 
-ssh -i waldoge_key_pair.pem ubuntu@52.207.153.98
-scp -i waldoge_key_pair.pem /home/gan/csc326 ubuntu@52.207.153.98:~/
+ssh -i waldoge_key_pair.pem ubuntu@18.232.160.163
+scp -i waldoge_key_pair.pem -r ~/csc326 ubuntu@18.232.160.163:~/
 
 scp -r /home/gan/csc326 ubuntu@52.207.153.98:~/
 

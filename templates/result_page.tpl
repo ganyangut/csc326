@@ -17,13 +17,13 @@
     <!-- if user has not logged in, display the log_in button -->
     % if login == False:
     <form id="login_form" action="/login/result" method="get">
-        <input id="login_button" value="Log in" type="submit">
+        <input id="login_button" class="btn btn-info btn-lg" value="Log in" type="submit">
     </form>
     <!-- if user has logged in, display the user email, user name... -->
     %else:
     <form id="login_form">
-        <button id="user_name" type="button" class="btn btn-info btn-lg" 
-                data-toggle="modal" data-target="#logout_modal">{{user_name}}</button>
+        <button id="user_email" type="button" class="btn btn-info btn-lg" 
+                data-toggle="modal" data-target="#logout_modal">{{user_email}}</button>
     </form>
     %end
 
@@ -32,6 +32,21 @@
         <form id="search_form" action="/" method="post" >
             <input id="input_box" name="keywords" type="text" placeholder=" Here he is! Type here to do another search. ">            
             <input id="search_button" value="Waldoge Search" type="submit">
+            %if login and history:
+                %length=len(history)
+                %print "length: "+repr(length)
+            <table id="topSearchedTable">
+                <tr>
+                    <th colspan="{{length}}" style="font-size:20px">Top Searched Words</th>
+                </tr> 
+                <tr>
+                %for entry in history:
+                    %print entry[0]
+                    <th>{{entry[0]}}</th>
+                %end
+                </tr>
+            </table>
+            %end
         </form>
     </div>
 
@@ -86,13 +101,14 @@
     </div>
 
 
-     <!-- log out modal --> 
+    %if login:
+    <!-- log out modal --> 
     <form action="/logout" method="get">
     <div class="modal" id="logout_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{user_name}}</h5>
+        <h5 class="modal-title">{{user_email}}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -108,6 +124,8 @@
     </div>
     </div>
     </form>
+    %end
+    
 </body>
 
 </html>
