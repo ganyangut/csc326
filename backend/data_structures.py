@@ -7,6 +7,7 @@ from collections import OrderedDict
 class UserHistoryIndex(dict):
     def __init__(self):
         dict.__init__(self)
+        self['anonymous_mode']=History()
 
     # get user's history, if user does not exist, create a new user
     def get_history(self, _email):
@@ -80,6 +81,31 @@ class History(OrderedDict):
             if counter >= 20:
                 break
         return popular.items()
+
+#save user session {email:session}
+class UserSession(dict):
+    def __init__(self):
+        dict.__init__(self)
+        self['anonymous_mode']={}
+
+    def get_session(self, _email):
+        if _email in self.keys():
+            return self[_email]
+        # if user does not exist, create a new user history
+        self[_email] = History()
+        return self[_email]
+
+    def add_new_user_session(self, _email, _session):
+        if not isinstance(_session, dict):
+            raise ValueError("user value must be a dict")
+        if _email in self.keys():
+            print "update user session"
+        if not _email in self.keys():
+            print "add a new user session"
+        self[_email]=_session
+    
+    def destory(self):
+        self.clear()
 
 # key is document id
 # value is document

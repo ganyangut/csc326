@@ -27,9 +27,6 @@
     <form id="login_form">
         <button id="user_email" type="button" class="btn btn-info btn-lg" 
                 data-toggle="modal" data-target="#logout_modal">{{user_email}}</button>
-        <!--
-        <button id="user_name" type="button" class="btn btn-info btn-lg">{{user_name}}</button>
-        -->
     </form>
     %end
 
@@ -52,10 +49,11 @@
             </tr>
         </table>
         %end
+        
     </form>
 
-    %if login:
     <!-- log out modal --> 
+    %if login:
     <form action="/logout" method="get">
     <div class="modal" id="logout_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">

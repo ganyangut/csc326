@@ -49,13 +49,15 @@
             %end
         </form>
     </div>
-
-    <h1> <a id="font1">Search for <a id="keyword_font">"{{keywords}}"  </h1>
-
+    <!--if input is empty do nothing-->
+    %if keywords.strip() != '':
+        <h1> <a id="font1">Search for <a id="keyword_font">"{{keywords}}" </h1>
+    %end
     <div class="row">        
         <!-- if a phrase is submitted, list the number od keywords in the pharse and 
             the number of apperances for each keyword in the pharse 
         -->
+        %if keywords.strip() != '':
         % if len(words_count) > 1 or next(iter(words_count.values())) > 1:
         <div class="column">    
             <table id="results">
@@ -75,11 +77,11 @@
             </table>
         </div>
         %end
-
+        %end
         <!--Display the top 20 keywords on the query page, 
             and the total number of times that these words have been searched.
         -->
-        % if login and history:
+        % if history:
         <div class="column">                
             <table id="history">
                 <tr>
