@@ -37,24 +37,22 @@
     <form id="search_form" action="/" method="post" >
         <input id="input_box" name="keywords" type="text" placeholder=" Where's waldoge? ">            
         <input id="search_button" value="Waldoge Search" type="submit">
-
         %if login and history:
-          %length=len(history)
-          %print "length: "+repr(length)
+            %length = len(history)
+            %print "length: "+repr(length)
         <table id="topSearchedTable">
-         <tr>
-         <th colspan="{{length}}" style="font-size:20px">Top Searched Words</th>
-         </tr> 
-         <tr>
-          %for entry in history:
-            %print entry[0]
-            <th>{{entry[0]}}</th>
-          %end
-         </tr>
+            <tr>
+                <th colspan="{{length}}" style="font-size:20px">Top Searched Words</th>
+            </tr> 
+            <tr>
+            %for entry in history:
+                %print entry[0]
+                <th>{{entry[0]}}</th>
+            %end
+            </tr>
         </table>
         %end
     </form>
-
 
     %if login:
     <!-- log out modal --> 
@@ -63,7 +61,7 @@
     <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{user_name}}</h5>
+        <h5 class="modal-title">{{user_email}}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>

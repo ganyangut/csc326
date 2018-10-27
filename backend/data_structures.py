@@ -1,29 +1,23 @@
 from collections import OrderedDict
-
-#every user has a own history
-#every history stores up to 20 popular keywords
-
-# key: useremail
+    
+# every user has a own history
+# every history stores up to 20 popular keywords
+# key: user_email
 # value: history
-class user(dict):
-
+class UserHistoryIndex(dict):
     def __init__(self):
         dict.__init__(self)
-    
-    #add a new user if user doesnot exist
-    def add_if_new_user(self, _email):
-        if not _email in self.keys():
-            self[_email]=history()
-    #get user's history, if user doesnot exist, create a new user
+
+    # get user's history, if user does not exist, create a new user
     def get_history(self, _email):
         if _email in self.keys():
             return self[_email]
-        else:
-            self[_email]=history()
-            return self[_email]
+        # if user does not exist, create a new user history
+        self[_email] = History()
+        return self[_email]
 
     def add_new_user_history(self, _email, _history):
-        if not isinstance(_history, history):
+        if not isinstance(_history, History):
             raise ValueError("user value must be a history")
         if _email in self.keys():
             raise KeyError ('user alreay exits')
@@ -34,11 +28,7 @@ class user(dict):
     def destory(self):
         self.clear()
 
-
-
-    
-
-class history(OrderedDict):    
+class History(OrderedDict):    
     
     def __init__(self):
         OrderedDict.__init__(self)    
