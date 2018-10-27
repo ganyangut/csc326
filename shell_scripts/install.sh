@@ -12,17 +12,19 @@ sudo apt install python
 # install pip
 sudo apt install python-pip
 # install bottle
-pip install bottle
+pip install --upgrade bottle
 # install oauth2client: 
 pip install --upgrade oauth2client
 # install beaker.middleware: 
-pip install beaker
+pip install --upgrade beaker
 # install Google API client: (this should also install httplib2, if not: pip install httplib2)
 pip install --upgrade google-api-python-client
+# install requests HTTP library.
+pip install --upgrade requests
 # install boto:
-pip install boto
+pip install --upgrade boto
 # install awscli:
-pip install awscli
+pip install --upgrade awscli
 # add awscli path to your $PATH:
     # import awecli in a python file
     # print awecli.__path__

@@ -3,17 +3,16 @@ import operator
 import json
 import httplib2
 import requests
-from backend.data_structures import UserHistoryIndex, History
+from backend.data_structures import UserHistoryIndex, History, UserRecentWordsIndex, RecentWords
 from bottle import Bottle, route, run, template, get, post, request, static_file, redirect, app
 from oauth2client.client import OAuth2WebServerFlow, flow_from_clientsecrets
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
 from beaker.middleware import SessionMiddleware
 
-
 # declare golbal variables
-login = False
 user_history_index = UserHistoryIndex()
+user_recent_words_index = UserRecentWordsIndex()
 
 current_page = 'query_page'
 keywords  = ''
@@ -32,12 +31,12 @@ sessions_opts = {
 @get('/')  # or @route('/')
 def home():
     print "------route---home------------------------------"
-    if login:
-        session = request.environ.get('beaker.session')
-        return template('./templates/query_page.tpl', login = login, 
-            user_email = session["user_email"], history = user_history_index.get_history(session["user_email"]).get_popular())
+    session = request.environ.get('beaker.session')
+    if "user_email" in session:        
+        return template('./templates/query_page.tpl', login = True, 
+                user_email = session["user_email"], recent_words = user_recent_words_index.get_recent_words(session["user_email"]))
     else:
-        return template('./templates/query_page.tpl', login = login)
+        return template('./templates/query_page.tpl', login = False)
 
 # show search results, word count, and search history
 @post('/')  # or @route('/', method='POST')
@@ -54,14 +53,18 @@ def show_results():
 
     # add keyword to history
     # joining words instead of the original string to avoid multiple whitespaces
-    if login:
-        session = request.environ.get('beaker.session')
+    session = request.environ.get('beaker.session')
+    if "user_email" in session:
         user_history_index.get_history(session["user_email"]).add_new_keywords(words_list)
+        user_recent_words_index.get_recent_words(session["user_email"]).add_new_keywords(words_list)
         print "words_count: "+repr(words_count)
-        return template('./templates/result_page.tpl', keywords = keywords, words_count = words_count, login = login, 
-            user_email = session["user_email"], history = user_history_index.get_history(session["user_email"]).get_popular())
+        return template('./templates/result_page.tpl', keywords = keywords, words_count = words_count, login = True, 
+                user_email = session["user_email"], recent_words = user_recent_words_index.get_recent_words(session["user_email"]),
+                history = user_history_index.get_history(session["user_email"]).get_popular())
     else:
-        return template('./templates/result_page.tpl', keywords = keywords, words_count = words_count, login = login)
+        user_history_index.get_history("anonymous").add_new_keywords(words_list)
+        return template('./templates/result_page.tpl', keywords = keywords, words_count = words_count, login = False,
+                history = user_history_index.get_history("anonymous").get_popular())
 
 #if user login in the query_page, set the current page to query_page
 @route('/login', method='GET')
@@ -84,10 +87,6 @@ def google_login():
     print "------route---login------------------------------"
     flow = flow_from_clientsecrets('client_secrets.json', scope = SCOPE, redirect_uri = REDIRECT_URI)
     uri = flow.step1_get_authorize_url()
-    print "flow: "
-    print flow
-    print "uri: "
-    print uri
     return redirect(str(uri))
 
 def credentials_to_dict(credentials):
@@ -103,22 +102,13 @@ def credentials_to_dict(credentials):
 @route('/logout', method='GET')
 def google_logout():
     print "------route---logout------------------------------"
-    #TODO: empty gobal variables
-    global login
-    login = False
-
     session = request.environ.get('beaker.session')
     requests.post('https://accounts.google.com/o/oauth2/revoke',
         params={'token': session["token"]},
         headers = {'content-type': 'application/x-www-form-urlencoded'})
-
     print "\n session: " + repr(session)
     session.delete()
-    print "\n session: " + repr(session)
-    #request.POST('https://accounts.google.com/o/oauth2/revoke',
-    #    params={'token': token})
-    #requests.post('https://accounts.google.com/o/oauth2/revoke', params={'token': token}, headers = {'content-type': 'application/x-www-form-urlencoded'})
-    
+    print "\n session: " + repr(session)       
     return redirect('/')
 
 '''
@@ -138,29 +128,22 @@ def redirect_page():
     flow = OAuth2WebServerFlow(client_id=load_dict['web']['client_id'], client_secret=load_dict['web']['client_secret'],
                                 scope=SCOPE, redirect_uri=REDIRECT_URI)
     credentials = flow.step2_exchange(code)
-
     print credentials_to_dict(credentials)
 
     # acquire refresh tokens for offline access, syncing Google accounts when users are not actively logged in.
-    #global token
     #token = credentials.id_token['sub']
-    #token = credentials.get_access_token()[0]
     token = credentials.access_token
 
     # retrieve user's data
     http = httplib2.Http()
     http = credentials.authorize(http)
-
     print credentials_to_dict(credentials)
 
     # Get user info
     users_service = build('oauth2', 'v2', http=http)
     user_document = users_service.userinfo().get().execute()
     #print "\n user_document: " + repr(user_document)
-    user_email = user_document['email']
-    # Fetch user history from database or create a new one
-
-
+    user_email = user_document['email']    
     # maintain a session for the user
     session = request.environ.get('beaker.session')
     session["user_email"] = user_email
@@ -171,22 +154,20 @@ def redirect_page():
     print "\n session: " + repr(session)
     return redirect('/user')
 
+
+
 #after user login, they will stay on the same page (query_page || result_page)
 @route('/user')
 def user_login():
     print "------route---user------------------------------"
-    global login
-    login = True
-
     session = request.environ.get('beaker.session')
-
     if current_page == 'query_page':
-        return template('./templates/query_page.tpl', login = login, 
-            user_email = session["user_email"], history = user_history_index.get_history(session["user_email"]).get_popular())
+        return template('./templates/query_page.tpl', login = True, 
+            user_email = session["user_email"], recent_words = user_recent_words_index.get_recent_words(session["user_email"]))
     else:
-        return template('./templates/result_page.tpl', keywords = keywords, words_count = words_count, login = login, 
-            user_email = session["user_email"], history = user_history_index.get_history(session["user_email"]).get_popular())
-       
+        return template('./templates/result_page.tpl', keywords = keywords, words_count = words_count, login = True, 
+            user_email = session["user_email"], recent_words = user_recent_words_index.get_recent_words(session["user_email"]),
+            history = user_history_index.get_history(session["user_email"]).get_popular())
 
 # routes of assets (css, js, images)
 @route('/assets/<filename:path>')
