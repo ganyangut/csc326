@@ -32,7 +32,6 @@
         <form id="search_form" action="/" method="post" >
             <input id="input_box" name="keywords" type="text" placeholder=" Here he is! Type here to do another search. ">            
             <input id="search_button" value="Waldoge Search" type="submit">
-
             %if login and history:
                 %length=len(history)
                 %print "length: "+repr(length)
@@ -47,8 +46,7 @@
                 %end
                 </tr>
             </table>
-             %end
-
+            %end
         </form>
     </div>
 
@@ -102,8 +100,9 @@
         %end
     </div>
 
+
     %if login:
-     <!-- log out modal --> 
+    <!-- log out modal --> 
     <form action="/logout" method="get">
     <div class="modal" id="logout_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -126,6 +125,7 @@
     </div>
     </form>
     %end
+    
 </body>
 
 </html>

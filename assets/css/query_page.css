@@ -28,6 +28,7 @@ img.title_image{
     border-radius: 90px;
     font-size: 14px;
 }
+
 #search_form{
     height: 100px;
     width: 700px;
@@ -63,14 +64,11 @@ table{
     border: 1px solid black;
     word-wrap: break-word;
 }
-
-tr{
+ tr{
     height: 40px;
     background-color: #f1f1f1;
 }
-
-
-th{
+ th{
     background-color: white;
     border: 1px solid black;
-}
+} 
