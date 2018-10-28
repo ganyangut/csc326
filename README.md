@@ -29,6 +29,11 @@ a search engine project
   * in a web browser, enter:
     * localhost:8081
 
+* Troubleshoot
+  * we already tested the web application, but in case there's anything doesn't work, you can try: 
+    * remove data folder
+    * clear cache in a web browser
+
 ### AWS related
 
 * How to test the web page currently running on our aws instance
