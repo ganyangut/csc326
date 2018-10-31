@@ -59,6 +59,7 @@
         <!-- if a none-empty phrase is submitted, list the number od keywords in the pharse and 
             the number of apperances for each keyword in the pharse 
         -->
+
         % if keywords.strip() != '':
             % if len(words_count) > 1 or next(iter(words_count.values())) > 1:
             <div class="column">    

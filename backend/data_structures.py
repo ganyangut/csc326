@@ -1,9 +1,13 @@
 from collections import OrderedDict
 
+
 # each user has a own history
 # each History stores up to 20 popular keywords
 # key: user_email or "anonymous"
 # value: History
+
+    
+
 class UserHistoryIndex(dict):
     def __init__(self):
         dict.__init__(self)
@@ -110,6 +114,7 @@ class RecentWords(list):
                 self.pop()
             # insert at the head of the list
             self.insert(0, keyword)
+
 
 # key is document id
 # value is document
