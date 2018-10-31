@@ -26,6 +26,7 @@ from collections import defaultdict
 from data_structures import *
 import re
 import unicodedata
+import sqlite3 as lite
 
 from timeit import default_timer as timer
 
@@ -49,6 +50,11 @@ class crawler(object):
     def __init__(self, db_conn, url_file):
         """Initialize the crawler with a connection to the database to populate
         and with the file containing the list of seed URLs to begin indexing."""
+        self._db_conn = 
+        self._db_cursor = .cursor()
+        cur.execute("CREATE TEABLE stocks ()")
+
+
         self._url_queue = [ ]
         self._doc_id_cache = { }
         self._word_id_cache = { }
@@ -433,15 +439,27 @@ class crawler(object):
             raise KeyError("doc_id not valid")
         return self.document_index[doc_id].short_description
 
+    #create database tables
+    def _init_db_tables(self):
+        cursor=self._db_cursor
+        if cursor:
+            cursor.execute("CREATE TABLE ")
+
+
 if __name__ == "__main__":    
     
     start = timer()
-
+    db_conn= lite.connect("dbFile.db")
+    bot.clawer(db_conn,"urls.txt")
+    bot.crawl(depth=1)
+    end = timer()
+'''
+    Lab1
     bot = crawler(None, "urls.txt")
     bot.crawl(depth=1)
 
     end = timer()
-
+'''
     # code below is for testing
 
     #bot.crawl(depth=0)
