@@ -1,0 +1,18 @@
+Maximum number of connections that can be handled by the server before any connection drops
+    50 (tested, may be more)
+
+Maximum number of requests per second (RPS) that can be sustained by the server when operating with maximum number of connections
+    143.90 [#/sec]
+
+Average and 99 percentile of response time or latency per request 
+    50%    284 ms
+    99%   1082 ms
+
+Utilization of CPU, memory, disk IO, and network when max performance is sustained
+    Max CPU usage           10%
+    Max memory usage        less than 32.0M
+    Max disk I/O            0/0
+    Max network read/write  78k/231k
+
+Raw data locates in 
+    lab2_group_20/test_results/

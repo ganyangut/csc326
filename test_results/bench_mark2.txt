@@ -1,9 +1,9 @@
-gan@gan-ubuntu:~/csc326$ ab -n 1000 -c 50 http://52.207.153.98:80/?keywords=helloworld+foo+bar
+gan@gan-ubuntu:~/csc326$ ab -n 1000 -c 50 http://54.196.143.244:80/?keywords=helloworld+foo+bar
 This is ApacheBench, Version 2.3 <$Revision: 1807734 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
 
-Benchmarking 52.207.153.98 (be patient)
+Benchmarking 54.196.143.244 (be patient)
 Completed 100 requests
 Completed 200 requests
 Completed 300 requests
@@ -18,7 +18,7 @@ Finished 1000 requests
 
 
 Server Software:        WSGIServer/0.1
-Server Hostname:        52.207.153.98
+Server Hostname:        54.196.143.244
 Server Port:            80
 
 Document Path:          /?keywords=helloworld+foo+bar

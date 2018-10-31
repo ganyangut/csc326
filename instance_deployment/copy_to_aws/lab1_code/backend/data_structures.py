@@ -1,46 +1,14 @@
 from collections import OrderedDict
 
 
-# each user has a own history
-# each History stores up to 20 popular keywords
-# key: user_email or "anonymous"
-# value: History
-
-    
-
-class UserHistoryIndex(dict):
-    def __init__(self):
-        dict.__init__(self)
-
-    # get user's history, if user history does not exist, create a new user history
-    def get_history(self, _email):
-        if _email in self.keys():
-            return self[_email]
-        # if user history does not exist, create a new user history
-        self[_email] = History()
-        return self[_email]
-
-'''
-    def add_new_user_history(self, _email, _history):
-        if not isinstance(_history, History):
-            raise ValueError("user value must be a history")
-        if _email in self.keys():
-            raise KeyError ('user alreay exits')
-        if not _email in self.keys():
-            raise KeyError("user not found")
-        self[_email]=_history
-    
-    def destory(self):
-        self.clear()
-'''
-class History(OrderedDict):    
+class history(OrderedDict):    
     
     def __init__(self):
         OrderedDict.__init__(self)    
     
     # the format of each entry is 
-    # keyword : (number of times searched, how recent the keyword is searched)
-    # "how recent the keyword is searched" is recorded in an integer, 1 means most recent, larger number means the keyword is older
+    # keyword : (number of times searched, how recent the keyword is saerched)
+    # "how recent the keyword is saerched" is recorded in an integer, 1 means most recent, larger number means the keyword is older
     def add_new_keywords(self, words_list):        
         # make exsiting keywords old before adding new keyword
         self.make_keywords_old()        
@@ -58,7 +26,7 @@ class History(OrderedDict):
     
     def sort(self):
         # sort key word by "number of times searched" first
-        # if "number of times searched" is the same, rank depends on "how recent the keyword is searched"
+        # if "number of times searched" is the same, rank depends on "how recent the keyword is saerched"
         temp = OrderedDict(sorted(self.items(), key = lambda entry : (-entry[1][0], entry[1][1])))
         
         # assignment to self is not allowed, so we need to clear and add entries one by one 
@@ -85,36 +53,6 @@ class History(OrderedDict):
             if counter >= 20:
                 break
         return popular.items()
-
-# each user has a own RecentWords
-# each RecentWords stores up to 10 recent keywords
-# key: user_email
-# value: RecentWords
-class UserRecentWordsIndex(dict):
-    def __init__(self):
-        dict.__init__(self)
-
-    # get user's recent words list, if recent words list does not exist, create a new recent words list
-    def get_recent_words(self, _email):
-        if _email in self.keys():
-            return self[_email]
-        # if user does not exist, create a new recent words list
-        self[_email] = RecentWords()
-        return self[_email]
-
-class RecentWords(list):    
-    
-    def __init__(self):
-        list.__init__(self)    
-    
-    def add_new_keywords(self, words_list):
-        for keyword in words_list:
-            # if the recent words list reached max size
-            if len(self) == 10:
-                self.pop()
-            # insert at the head of the list
-            self.insert(0, keyword)
-
 
 # key is document id
 # value is document

@@ -2,69 +2,90 @@
 
 a search engine project
 
-## Lab 2:
+## Lab 2
 
-1. install modules:
-  * ~/csc326$ . shell_scripts/install.sh
+### Local version (with Google Login)
 
-2. add awscli path to your $PATH:
-  * import awecli in a python file
-  * print awecli.\_\_path\_\_
-  * edit ~/.bashrc 
-  * add a line: export PATH=$PATH:<your_local_path>
+* install necessary packages (including packages for AWS and benchmark):
+  * ~/lab2_group_20$ source setup.sh
 
-3. deploy a instance:
-  * ~/csc326$ cd instance_deployment/
-  * ~/csc326/instance_deployment$ python deploy_instance.py
+* add awscli path to your $PATH:
+  * in a python terminal or file
+    * import awecli
+    * print awecli.\_\_path\_\_
+  * <your_local_awecli_path> should be printed
+  * use your favorite editor to edit ~/.bashrc
+    * add a line: export PATH=$PATH:<your_local_awecli_path>
 
-4. check the information of the instance just started:
-  * ~/csc326/instance_deployment$ python check_running_instance.py
+* run aws configure in terminal
+  * fill in the appropriate values
+  * use us-east-1 as the location
+  * the format can be left as the default None
 
-5. connect to the instance:
-  * ~/csc326/instance_deployment$ ssh -i waldoge_key_pair.pem ubuntu@<public_ip_address>
-  * <public_ip_address> should be printed in step 4
+* How to run our search engine:
+  * ~/lab2_group_20$ python frontend.py
 
-6. open another bash shell, copy our program to the instance:
-  * ~/csc326/instance_deployment$ scp -i waldoge_key_pair.pem -r ~/csc326 ubuntu@<public_ip_address>:~/
+* How to test the web page
+  * in a web browser, enter:
+    * localhost:8081
 
-7. in the instance
-  * ubuntu@ip-<private_ip_address>:~$ . shell_scripts/install.sh
-  * ubuntu@ip-<private_ip_address>:~$ cd csc326
-  * ubuntu@ip-<private_ip_address>:~$ vim frontend.py
-  * inside frontend.py: change localhost to <private_ip_address>
-  * ubuntu@ip-<private_ip_address>:~$ sudo python frontend.py
+* Troubleshoot
+  * we already tested the web application, but in case there's anything doesn't work, you can try: 
+    * remove data folder
+    * clear cache in a web browser
 
-8. test the web page in a web browser
-  * the url is: <public_ip_address>:80
+### AWS related
 
-9. stop all running instances:
-  * ~/csc326/instance_deployment$ python stop_instance.py
+* How to test the web page currently running on our aws instance
+  * in a web browser, enter:
+    * http://54.196.143.244/
+
+* How to deploy a instance and run our search engine on aws:
+  * source the shell script
+    * ~/lab2_group_20$ source run_page_on_aws.sh
+    * <public_ip_address> should be printed out on the terminal
+    * <public_ip_address> is also avaliable in lab2_group_20/instance_deployment/public_ip.txt
+  * close the treminal
+  * test the web page
+    * in a web browser, enter:
+      * <public_ip_address>:80
+
+* How to check the information of all instances:
+  * ~/lab2_group_20/instance_deployment$ python check_all_instances.py
+
+* How to stop all instances:
+  * ~/lab2_group_20/instance_deployment$ python stop_all_instances.py
+
+* How to terminate all instances:
+  * ~/lab2_group_20/instance_deployment$ python terminate_all_instances.py
+
+### Benchmark
+
+* How to monitor resource utilization:
+  * ~/lab2_group_20$ source monitor_aws_resource_utilization.sh
+
+* How to evaluate the performance of the web application on AWS:
+  * ab -n <numberof request to perform>  -c <number of concurrent connection> http://hostname/path
+  * eg. this command sends 50 concurrent identical requests with keywords “helloworld foo bar” to our web page with a total of 1000 requests
+    * ~/lab2_group_20$ ab -n 1000 -c 50 http://54.196.143.244/?keywords=helloworld+foo+bar
 
 
-* to be solved problem, occur randomly
-  Error: 500 Internal Server Error
-  Sorry, the requested URL 'http://localhost:8081/redirect?code=4/dwDjxXw4eCWPT-VbpKgY6mUTSZO5qKIyXGb5q9-RcsyW9FJBDJqO-rJtyF0lxVhArz-X5YVfMJDXvaOqrC7c0lc&scope=https://www.googleapis.com/auth/plus.me+https://www.googleapis.com/auth/userinfo.email' caused an error:
-
-  Internal Server Error
-  Exception:
-  FlowExchangeError('invalid_grantBad Request',)
-
-  can be triggered with too many requests, try to clear cookie first 
+* Preliminary test results is in RESULT.txt
 
 
-## Lab 1:
+## Lab 1
 
-* how to run front end:
+* How to run front end:
   * in terminal, under lab1_group_20:
     * ~/lab1_group_20$ python frontend.py
   * in browser:
     * localhost:8081
 
-* how to run tests for backend:
+* How to run tests for backend:
   * in terminal, under lab1_group_20/backend:
     * ~/lab1_group_20/backend$ python test.py
 
-* how to run crawler:
+* How to run crawler:
   * in terminal, under lab1_group_20/backend:
     * ~/lab1_group_20/backend$ python crawler.py
 

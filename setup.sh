@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # install bottle
  #$ cd <YOUR-PROJECT-DIRECTORY>
@@ -7,24 +7,26 @@
  #$ cd bottle-0.12.7
  #$ python setup.py install --user
 
+# update list
+sudo apt-get update
 # install python2
-sudo apt install python
+sudo apt install -y python
 # install pip
-sudo apt install python-pip
+sudo apt install -y python-pip
 # install bottle
-pip install bottle
+pip install --upgrade bottle
 # install oauth2client: 
 pip install --upgrade oauth2client
 # install beaker.middleware: 
-pip install beaker
+pip install --upgrade beaker
 # install Google API client: (this should also install httplib2, if not: pip install httplib2)
 pip install --upgrade google-api-python-client
+# install requests HTTP library.
+pip install --upgrade requests
 # install boto:
-pip install boto
+pip install --upgrade boto
 # install awscli:
-pip install awscli
-# add awscli path to your $PATH:
-    # import awecli in a python file
-    # print awecli.__path__
-    # edit ~/.bashrc 
-    # add a line: export PATH=$PATH:<your_local_path>
+pip install --upgrade awscli
+
+# install the Apache benchmarking tool
+sudo apt-get install -y apache2-utils
