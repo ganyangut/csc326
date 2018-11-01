@@ -1,16 +1,16 @@
 
 # Copyright (C) 2011 by Peter Goodman
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,6 +30,7 @@ import sqlite3 as lite
 
 from timeit import default_timer as timer
 
+
 def attr(elem, attr):
     """An html attribute from an html element. E.g. <a href="">, then
     attr(elem, "href") will get the href or an empty string."""
@@ -38,7 +39,9 @@ def attr(elem, attr):
     except:
         return ""
 
+
 WORD_SEPARATORS = re.compile(r'\s|\n|\r|\t|[^a-zA-Z0-9\-_]')
+
 
 class crawler(object):
     """Represents 'Googlebot'. Populates a database by crawling and indexing
@@ -50,19 +53,18 @@ class crawler(object):
     def __init__(self, db_conn, url_file):
         """Initialize the crawler with a connection to the database to populate
         and with the file containing the list of seed URLs to begin indexing."""
-        self._db_conn = 
-        self._db_cursor = .cursor()
-        cur.execute("CREATE TEABLE stocks ()")
+        self._db_conn = db_conn
+        self._db_cursor = db_conn.cursor()
+        self._init_db_tables()
 
-
-        self._url_queue = [ ]
-        self._doc_id_cache = { }
-        self._word_id_cache = { }
+        self._url_queue = []
+        self._doc_id_cache = {}
+        self._word_id_cache = {}
 
         self.document_index = document_index()
         self.inverted_index = inverted_index()
         self.resolved_inverted_index = resolved_inverted_index()
-        self.lexicon = { }
+        self.lexicon = {}
 
         # functions to call when entering and exiting specific tags
         self._enter = defaultdict(lambda *a, **ka: self._visit_ignore)
@@ -103,8 +105,8 @@ class crawler(object):
 
         # never go in and parse these tags
         self._ignored_tags = set([
-            'meta', 'script', 'link', 'meta', 'embed', 'iframe', 'frame', 
-            'noscript', 'object', 'svg', 'canvas', 'applet', 'frameset', 
+            'meta', 'script', 'link', 'meta', 'embed', 'iframe', 'frame',
+            'noscript', 'object', 'svg', 'canvas', 'applet', 'frameset',
             'textarea', 'style', 'area', 'map', 'base', 'basefont', 'param',
         ])
 
@@ -131,14 +133,15 @@ class crawler(object):
         try:
             with open(url_file, 'r') as f:
                 for line in f:
-                    self._url_queue.append((self._fix_url(line.strip(), ""), 0))
+                    self._url_queue.append(
+                        (self._fix_url(line.strip(), ""), 0))
         except IOError:
             pass
-    
+
     def _insert_document(self, url):
         """A function that inserts a url into a document db table
         and then returns that newly inserted document's id."""
-                
+
         ret_id = self._next_doc_id
         self._next_doc_id += 1
 
@@ -146,18 +149,18 @@ class crawler(object):
         self.document_index[ret_id] = new_document
 
         return ret_id
-    
+
     def _insert_word(self, word):
         """A function that inserts a word into the lexicon db table
         and then returns that newly inserted word's id."""
         ret_id = self._next_word_id
         self._next_word_id += 1
 
-        # add word to lexicon        
+        # add word to lexicon
         self.lexicon[ret_id] = word
 
         return ret_id
-    
+
     def word_id(self, word):
         """Get the word id of some specific word."""
         if word in self._word_id_cache:
@@ -165,29 +168,29 @@ class crawler(object):
         else:
             # 1) add the word to the lexicon, if that fails, then the
             #    word is in the lexicon
-            # 2) query the lexicon for the id assigned to this word, 
+            # 2) query the lexicon for the id assigned to this word,
             #    store it in the word id cache, and return the id.
             word_id = self._insert_word(word)
             self._word_id_cache[word] = word_id
-        
+
         # add the word to inverted index and resolved inverted index
         self.inverted_index.add(word_id, self._curr_doc_id)
-        self.resolved_inverted_index.add(word, self._curr_url)        
-        
+        self.resolved_inverted_index.add(word, self._curr_url)
+
         return word_id
-    
+
     def document_id(self, url):
         """Get the document id for some url."""
         if url in self._doc_id_cache:
             return self._doc_id_cache[url]
-        
+
         # if the document doesn't exist in the db
         # then only insert the url and leave
-        # the rest to their defaults        
+        # the rest to their defaults
         doc_id = self._insert_document(url)
         self._doc_id_cache[url] = doc_id
         return doc_id
-    
+
     def _fix_url(self, curr_url, rel):
         """Given a url and either something relative to that url or another url,
         get a properly parsed url."""
@@ -195,13 +198,14 @@ class crawler(object):
         rel_l = rel.lower()
         if rel_l.startswith("http://") or rel_l.startswith("https://"):
             curr_url, rel = rel, ""
-            
-        # compute the new url based on import 
+
+        # compute the new url based on import
         curr_url = urlparse.urldefrag(curr_url)[0]
         parsed_url = urlparse.urlparse(curr_url)
         fixed_url = urlparse.urljoin(parsed_url.geturl(), rel)
         try:
-            fixed_url = unicodedata.normalize('NFKD', fixed_url).encode('ascii','ignore')
+            fixed_url = unicodedata.normalize(
+                'NFKD', fixed_url).encode('ascii', 'ignore')
         finally:
             return fixed_url
 
@@ -209,59 +213,64 @@ class crawler(object):
         """Add a link into the database, or increase the number of links between
         two pages in the database."""
         if self.document_index[from_doc_id].links == None:
-            self.document_index[from_doc_id].links = { }
+            self.document_index[from_doc_id].links = {}
         # if the link exists in the db, increase the number
         if to_doc_id in self.document_index[from_doc_id].links:
-            self.document_index[from_doc_id].links[to_doc_id] += 1 
-        else: # if the link doesn't exist in the db, add it
+            self.document_index[from_doc_id].links[to_doc_id] += 1
+        else:  # if the link doesn't exist in the db, add it
             self.document_index[from_doc_id].links[to_doc_id] = 1
 
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
         # change unicode string to ascii string
-        title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
+        title_text = unicodedata.normalize(
+            'NFKD', title_text).encode('ascii', 'ignore')
 
-        print "document title="+ repr(title_text)
+        print "document title=" + repr(title_text)
 
         # update document title for document id self._curr_doc_id
         self.document_index[self._curr_doc_id].title = title_text
-    
+
     def _visit_a(self, elem):
         """Called when visiting <a> tags."""
 
-        dest_url = self._fix_url(self._curr_url, attr(elem,"href"))
+        dest_url = self._fix_url(self._curr_url, attr(elem, "href"))
 
         skip = False
         # if dest_url has been visited, no need to add title again
         if dest_url in self._doc_id_cache:
             skip = True
 
-        #print "href="+repr(dest_url), \
+        # print "href="+repr(dest_url), \
         #      "title="+repr(attr(elem,"title")), \
         #      "alt="+repr(attr(elem,"alt")), \
         #      "text="+repr(self._text_of(elem))
 
         # add the just found URL to the url queue
         self._url_queue.append((dest_url, self._curr_depth))
-        
+
         # add a link entry into the database from the current document to the
         # other document
-        self.add_link(self._curr_doc_id, self.document_id(dest_url))        
-        
+        self.add_link(self._curr_doc_id, self.document_id(dest_url))
+
         # add depth and title/alt/text to index for destination url
         if not skip:
-            self.document_index[self.document_id(dest_url)].depth = self._curr_depth
+            self.document_index[self.document_id(
+                dest_url)].depth = self._curr_depth
             # get text
-            text = attr(elem,"title") + attr(elem,"alt") + self._text_of(elem)
+            text = attr(elem, "title") + attr(elem, "alt") + \
+                self._text_of(elem)
             # change unicode string to ascii string
-            text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
+            text = unicodedata.normalize(
+                'NFKD', text).encode('ascii', 'ignore')
             # break into lines and remove leading and trailing space on each
             lines = (line.strip() for line in text.splitlines())
             # break multi-head lines
-            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-            # get first 3 non-blank lines                
-            short_description = [ ]
+            chunks = (phrase.strip()
+                      for line in lines for phrase in line.split("  "))
+            # get first 3 non-blank lines
+            short_description = []
             line_counter = 0
             for chunk in chunks:
                 if line_counter >= 3:
@@ -269,21 +278,22 @@ class crawler(object):
                 if chunk:
                     short_description.append(chunk)
                     line_counter += 1
-            self.document_index[self.document_id(dest_url)].title = "\n".join(short_description)
-            
+            self.document_index[self.document_id(
+                dest_url)].title = "\n".join(short_description)
+
     def _add_words_to_document(self):
         # knowing self._curr_doc_id and the list of all words and their
         # font sizes (in self._curr_words), add all the words into the
         # database for this document
         self.document_index[self._curr_doc_id].words = self._curr_words
-        print "    num words="+ str(len(self._curr_words))
+        print "    num words=" + str(len(self._curr_words))
 
     def _increase_font_factor(self, factor):
         """Increade/decrease the current font size."""
         def increase_it(elem):
             self._font_size += factor
         return increase_it
-    
+
     def _visit_ignore(self, elem):
         """Ignore visiting this type of tag"""
         pass
@@ -297,15 +307,16 @@ class crawler(object):
             if word in self._ignored_words:
                 continue
             # change unicode string to ascii string
-            word = unicodedata.normalize('NFKD', word).encode('ascii','ignore')
+            word = unicodedata.normalize(
+                'NFKD', word).encode('ascii', 'ignore')
             self._curr_words.append((self.word_id(word), self._font_size))
-        
+
     def _text_of(self, elem):
         """Get the text inside some element without any tags."""
         if isinstance(elem, Tag):
-            text = [ ]
+            text = []
             for sub_elem in elem:
-                text.append(self._text_of(sub_elem))            
+                text.append(self._text_of(sub_elem))
             return " ".join(text)
         else:
             return elem.string
@@ -317,11 +328,11 @@ class crawler(object):
         class DummyTag(object):
             next = False
             name = ''
-        
+
         class NextTag(object):
             def __init__(self, obj):
                 self.next = obj
-        
+
         tag = soup.html
         stack = [DummyTag(), soup.html]
 
@@ -345,9 +356,9 @@ class crawler(object):
                         self._exit[stack[-1].name.lower()](stack[-1])
                         stack.pop()
                         tag = NextTag(tag.parent.nextSibling)
-                    
+
                     continue
-                
+
                 # enter the tag
                 self._enter[tag_name](tag)
                 stack.append(tag)
@@ -359,10 +370,10 @@ class crawler(object):
     def crawl(self, depth=2, timeout=3):
         """Crawl the web!"""
         seen = set()
-        
+
         while len(self._url_queue):
 
-            url, depth_ = self._url_queue.pop()            
+            url, depth_ = self._url_queue.pop()
 
             # skip this url; it's too deep
             if depth_ > depth:
@@ -374,8 +385,8 @@ class crawler(object):
             if doc_id in seen:
                 continue
 
-            seen.add(doc_id) # mark this document as haven't been visited
-            
+            seen.add(doc_id)  # mark this document as haven't been visited
+
             # record the depth of current document
             self.document_index[doc_id].depth = depth_
 
@@ -388,19 +399,21 @@ class crawler(object):
                 self._curr_url = url
                 self._curr_doc_id = doc_id
                 self._font_size = 0
-                self._curr_words = [ ]
+                self._curr_words = []
                 self._index_document(soup)
                 self._add_words_to_document()
-                
+
                 # get text
                 text = soup.getText(separator=u' ')
-                text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
+                text = unicodedata.normalize(
+                    'NFKD', text).encode('ascii', 'ignore')
                 # break into lines and remove leading and trailing space on each
                 lines = (line.strip() for line in text.splitlines())
                 # break multi-head lines
-                chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-                # get first 3 non-blank lines                
-                short_description = [ ]
+                chunks = (phrase.strip()
+                          for line in lines for phrase in line.split("  "))
+                # get first 3 non-blank lines
+                short_description = []
                 line_counter = 0
                 for chunk in chunks:
                     if line_counter > 4:
@@ -409,20 +422,21 @@ class crawler(object):
                         if line_counter > 1:
                             short_description.append(chunk)
                         line_counter += 1
-                self.document_index[self._curr_doc_id].short_description = "\n".join(short_description)                
-                
+                self.document_index[self._curr_doc_id].short_description = "\n".join(
+                    short_description)
+
                 print "    url="+repr(self._curr_url)
-            
+
             except Exception as e:
                 print "Exception as e:"
                 print "url: " + url
                 print "depth: " + str(depth_)
-                print e                
+                print e
                 pass
             finally:
                 if socket:
                     socket.close()
-            
+
     def get_inverted_index(self):
         return self.inverted_index
 
@@ -433,25 +447,47 @@ class crawler(object):
         if doc_id not in self.document_index:
             raise KeyError("doc_id not valid")
         return self.document_index[doc_id].title
-    
+
     def get_short_description(self, doc_id):
         if doc_id not in self.document_index:
             raise KeyError("doc_id not valid")
         return self.document_index[doc_id].short_description
 
-    #create database tables
+    # create database tables
     def _init_db_tables(self):
-        cursor=self._db_cursor
+        cursor = self._db_cursor
         if cursor:
-            cursor.execute("CREATE TABLE ")
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS documentIndex(doc_id integer, url text, depth integer, title text, short_description text,words text, links text, PRIMARY KEY(doc_id));"
+            )
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS links(destination_url_id integer,occurrence_number integer,PRIMARY KEY(destination_url_id))"
+            )
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS lexicon(word_id integer, words text, PRIMARY KEY(word_id))"
+            )
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS invertedIndex(word_id integer,doc_id integer,PRIMARY KEY(word_id))"
+            )
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS resolvedInvertedIndex(words text, document_url text)"
+            )
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS pageRank(doc_id integer,rank_score real, PRIMARY KEY(doc_id))"
+            )
+
+    def _disconnect_db(self):
+        self._db_conn.commit()
+        self._db_conn.close()
 
 
-if __name__ == "__main__":    
-    
+if __name__ == "__main__":
+
     start = timer()
-    db_conn= lite.connect("dbFile.db")
-    bot.clawer(db_conn,"urls.txt")
+    db_conn = lite.connect("dbFile.db")
+    bot = crawler(db_conn, "urls.txt")
     bot.crawl(depth=1)
+    bot._disconnect_db()
     end = timer()
 '''
     Lab1
@@ -460,29 +496,29 @@ if __name__ == "__main__":
 
     end = timer()
 '''
-    # code below is for testing
+# code below is for testing
 
-    #bot.crawl(depth=0)
-    
-    #print bot._url_queue
-    #print bot._doc_id_cache
-    #print bot._word_id_cache
-    #print bot.document_index
-    #print bot.inverted_index
-    #print bot.resolved_inverted_index
-    #print "lexicon: "
-    #print bot.lexicon
-    
-    #print bot.get_inverted_index()
-    #print bot.get_resolved_inverted_index()
-    #print bot.get_title(35)
-    #print bot.get_short_description(35)
-    
-    #print "words: "
-    #print bot.document_index[1].words
-    #print "links: "
-    #print bot.document_index[35].links
-    '''
+# bot.crawl(depth=0)
+
+# print bot._url_queue
+# print bot._doc_id_cache
+# print bot._word_id_cache
+# print bot.document_index
+# print bot.inverted_index
+# print bot.resolved_inverted_index
+# print "lexicon: "
+# print bot.lexicon
+
+# print bot.get_inverted_index()
+# print bot.get_resolved_inverted_index()
+# print bot.get_title(35)
+# print bot.get_short_description(35)
+
+# print "words: "
+# print bot.document_index[1].words
+# print "links: "
+# print bot.document_index[35].links
+'''
     for doc_id in bot.document_index:
         #if bot.document_index[doc_id].depth <= 1:
         print "url: " + bot.document_index[doc_id].url
@@ -495,7 +531,7 @@ if __name__ == "__main__":
         #print bot.document_index[doc_id].links
     '''
 
-    '''   
+'''   
     bot._curr_words = []
     bot.document_id("url: a")
     bot.document_id("url: b")
@@ -514,6 +550,4 @@ if __name__ == "__main__":
     title = bot.get_title(2)
     '''
 
-
-    
-    print(end - start)
+print(end - start)
