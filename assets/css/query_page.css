@@ -24,6 +24,7 @@ img.title_image{
 #login_button, #user_name{
     border-radius: 90px;
 }
+
 #user_email{
     border-radius: 90px;
     font-size: 14px;
@@ -64,10 +65,12 @@ table{
     border: 1px solid black;
     word-wrap: break-word;
 }
+
  tr{
     height: 40px;
     background-color: #f1f1f1;
 }
+
  th{
     background-color: white;
     border: 1px solid black;

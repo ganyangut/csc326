@@ -69,9 +69,7 @@ a search engine project
   * eg. this command sends 50 concurrent identical requests with keywords “helloworld foo bar” to our web page with a total of 1000 requests
     * ~/lab2_group_20$ ab -n 1000 -c 50 http://54.196.143.244/?keywords=helloworld+foo+bar
 
-
 * Preliminary test results is in RESULT.txt
-
 
 ## Lab 1
 
