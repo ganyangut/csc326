@@ -49,10 +49,11 @@
                 </tr>
             </table>
         %end
+        
     </form>
 
-    %if login:
     <!-- log out modal --> 
+    %if login:
     <form action="/logout" method="get">
         <div class="modal" id="logout_modal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
@@ -75,7 +76,6 @@
         </div>
     </form>
     %end
-
 </body>
 
 </html>
