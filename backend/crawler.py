@@ -27,9 +27,9 @@ from data_structures import *
 import re
 import unicodedata
 import sqlite3 as lite
+from database import *
 
 from timeit import default_timer as timer
-
 
 def attr(elem, attr):
     """An html attribute from an html element. E.g. <a href="">, then
@@ -53,9 +53,9 @@ class crawler(object):
     def __init__(self, db_conn, url_file):
         """Initialize the crawler with a connection to the database to populate
         and with the file containing the list of seed URLs to begin indexing."""
-        self._db_conn = db_conn
-        self._db_cursor = db_conn.cursor()
-        self._init_db_tables()
+        #self._db_conn = db_conn
+        #self._db_cursor = db_conn.cursor()
+        self.myDB=MyDatabase(db_conn)
 
         self._url_queue = []
         self._doc_id_cache = {}
@@ -142,24 +142,32 @@ class crawler(object):
         """A function that inserts a url into a document db table
         and then returns that newly inserted document's id."""
 
-        ret_id = self._next_doc_id
+        doc_id = self._next_doc_id
         self._next_doc_id += 1
 
         new_document = document(url=url)
-        self.document_index[ret_id] = new_document
+        #store document_index to data_structure
+        #self.document_index[ret_id] = new_document
 
-        return ret_id
+        #store document_index to db
+        self.myDB.insert_to_db_documentIndex(doc_id, new_document.url, new_document.depth, 
+                new_document.title, new_document.short_description, new_document.words, new_document.links)
+
+        return doc_id
 
     def _insert_word(self, word):
         """A function that inserts a word into the lexicon db table
         and then returns that newly inserted word's id."""
-        ret_id = self._next_word_id
+        word_id = self._next_word_id
         self._next_word_id += 1
 
         # add word to lexicon
-        self.lexicon[ret_id] = word
+        #self.lexicon[ret_id] = word
+        
+        #store lexicon to db
+        self.myDB.insert_to_db_lexicon(word_id,word)
 
-        return ret_id
+        return word_id
 
     def word_id(self, word):
         """Get the word id of some specific word."""
@@ -174,8 +182,13 @@ class crawler(object):
             self._word_id_cache[word] = word_id
 
         # add the word to inverted index and resolved inverted index
-        self.inverted_index.add(word_id, self._curr_doc_id)
-        self.resolved_inverted_index.add(word, self._curr_url)
+        #self.inverted_index.add(word_id, self._curr_doc_id)
+        #self.resolved_inverted_index.add(word, self._curr_url)
+
+        #add the word to inverted index and resolved inverted index
+        #store to db
+        self.myDB.insert_to_db_InvertedIndex(word_id,self._curr_doc_id)
+        self.myDB.insert_to_db_resolvedInvertedIndex(word,self._curr_url)
 
         return word_id
 
@@ -453,6 +466,11 @@ class crawler(object):
             raise KeyError("doc_id not valid")
         return self.document_index[doc_id].short_description
 
+    def _disconnect_db(self):
+        self.myDB.disconnect_db()
+
+    '''
+    # lab3
     # create database tables
     def _init_db_tables(self):
         cursor = self._db_cursor
@@ -476,10 +494,21 @@ class crawler(object):
                 "CREATE TABLE IF NOT EXISTS pageRank(doc_id integer,rank_score real, PRIMARY KEY(doc_id))"
             )
 
+    def _insert_to_db_documentIndex(self, doc_id, url, depth, title, short_description, words, links):
+        cursor = self._db_cursor
+        if cursor:
+            try:
+                cursor.execute(
+                    "INSERT INTO documentIndex VALUES(?,?,?,?,?,?,?)",
+                    doc_id, url, depth, title, short_description, words, links
+                )
+            except lite.Error as e:
+                raise e
+
     def _disconnect_db(self):
         self._db_conn.commit()
         self._db_conn.close()
-
+    '''
 
 if __name__ == "__main__":
 
@@ -487,7 +516,7 @@ if __name__ == "__main__":
     db_conn = lite.connect("dbFile.db")
     bot = crawler(db_conn, "urls.txt")
     bot.crawl(depth=1)
-    bot._disconnect_db()
+    #bot._disconnect_db()
     end = timer()
 '''
     Lab1
