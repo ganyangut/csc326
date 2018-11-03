@@ -53,9 +53,9 @@ class crawler(object):
         self._doc_id_cache = { }
         self._word_id_cache = { }
 
-        self.document_index = document_index()
-        self.inverted_index = inverted_index()
-        self.resolved_inverted_index = resolved_inverted_index()
+        self.document_index = DocumentIndex()
+        self.inverted_index = InvertedIndex()
+        self.resolved_inverted_index = ResolvedInvertedIndex()
         self.lexicon = { }
 
         # functions to call when entering and exiting specific tags
@@ -136,7 +136,7 @@ class crawler(object):
         ret_id = self._next_doc_id
         self._next_doc_id += 1
 
-        new_document = document(url=url)
+        new_document = Document(url=url)
         self.document_index[ret_id] = new_document
 
         return ret_id
@@ -200,15 +200,21 @@ class crawler(object):
             return fixed_url
 
     def add_link(self, from_doc_id, to_doc_id):
-        """Add a link into the database, or increase the number of links between
-        two pages in the database."""
-        if self.document_index[from_doc_id].links == None:
-            self.document_index[from_doc_id].links = { }
-        # if the link exists in the db, increase the number
-        if to_doc_id in self.document_index[from_doc_id].links:
-            self.document_index[from_doc_id].links[to_doc_id] += 1 
-        else: # if the link doesn't exist in the db, add it
-            self.document_index[from_doc_id].links[to_doc_id] = 1
+        """Add a link into the database. 
+        When a page contains multiple links to a document, 
+        only the first link should be counted. """
+        
+        # initialize the outgoing_links_set of from_doc_id if it doesn't exist
+        if self.document_index[from_doc_id].outgoing_links_set == None:
+            self.document_index[from_doc_id].outgoing_links_set = set()
+        # add to_doc_id to outgoing_links_set of from_doc_id
+        self.document_index[from_doc_id].outgoing_links_set.add(to_doc_id)
+
+        # initialize the incoming_links_set of to_doc_id if it doesn't exist
+        if self.document_index[to_doc_id].incoming_links_set == None:
+            self.document_index[to_doc_id].incoming_links_set = set()
+        # add from_doc_id to incoming_links_set of to_doc_id
+        self.document_index[to_doc_id].incoming_links_set.add(from_doc_id)
 
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""

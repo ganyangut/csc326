@@ -1,8 +1,10 @@
-backend/data_structures.pyc
 backend/__init__.pyc
+backend/data_structures.pyc
 backend/crawler.pyc
+backend/pagerank.pyc
+
 data
 
-instance_deployment/copy_to_aws/lab1_code/backend/data_structures.pyc
 instance_deployment/copy_to_aws/lab1_code/backend/__init__.pyc
+instance_deployment/copy_to_aws/lab1_code/backend/data_structures.pyc
 instance_deployment/copy_to_aws/lab1_code/backend/crawler.pyc
