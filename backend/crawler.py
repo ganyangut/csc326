@@ -1,4 +1,3 @@
-
 # Copyright (C) 2011 by Peter Goodman
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,6 +25,7 @@ from collections import defaultdict
 from data_structures import *
 import re
 import unicodedata
+import sqlite3
 
 from timeit import default_timer as timer
 
@@ -46,9 +46,41 @@ class crawler(object):
     This crawler keeps track of font sizes and makes it simpler to manage word
     ids and document ids."""
 
-    def __init__(self, db_conn, url_file):
+    def __init__(self, db_conn, url_file, crawler_id, total_threads):
         """Initialize the crawler with a connection to the database to populate
         and with the file containing the list of seed URLs to begin indexing."""
+        
+        self.crawler_id = crawler_id
+        self.db_conn = db_conn
+        self.db_cursor = db_conn.cursor()
+        '''
+        # Create table
+        self.db_cursor.executescript("""
+                CREATE TABLE IF NOT EXISTS lexicon(
+                    crawler_id INTEGER,
+                    word_id INTEGER,
+                    word_string TEXT
+                );
+                CREATE TABLE IF NOT EXISTS inverted_index(
+                    crawler_id INTEGER,
+                    word_id INTEGER,
+                    document_id INTEGER,
+                    UNIQUE (crawler_id, word_id, document_id)
+                );
+                CREATE TABLE IF NOT EXISTS links(
+                    crawler_id INTEGER,
+                    from_document_id INTEGER,
+                    to_document_id INTEGER
+                );
+                CREATE TABLE IF NOT EXISTS document_index(
+                    crawler_id INTEGER,
+                    document_id INTEGER,
+                    url TEXT, 
+                    title TEXT, 
+                    short_description TEXT
+                );        
+                """)        
+        '''
         self._url_queue = [ ]
         self._doc_id_cache = { }
         self._word_id_cache = { }
@@ -57,6 +89,7 @@ class crawler(object):
         self.inverted_index = InvertedIndex()
         self.resolved_inverted_index = ResolvedInvertedIndex()
         self.lexicon = { }
+        self.links = set()
 
         # functions to call when entering and exiting specific tags
         self._enter = defaultdict(lambda *a, **ka: self._visit_ignore)
@@ -150,6 +183,9 @@ class crawler(object):
         # add word to lexicon        
         self.lexicon[ret_id] = word
 
+        # insert into database
+        self.db_cursor.execute("INSERT INTO lexicon VALUES (?,?,?)", (self.crawler_id, ret_id, word))
+
         return ret_id
     
     def word_id(self, word):
@@ -166,7 +202,7 @@ class crawler(object):
         
         # add the word to inverted index and resolved inverted index
         self.inverted_index.add(word_id, self._curr_doc_id)
-        self.resolved_inverted_index.add(word, self._curr_url)        
+        self.resolved_inverted_index.add(word, self._curr_url)   
         
         return word_id
     
@@ -180,6 +216,11 @@ class crawler(object):
         # the rest to their defaults        
         doc_id = self._insert_document(url)
         self._doc_id_cache[url] = doc_id
+
+        # insert into database
+        self.db_cursor.execute('''INSERT INTO document_index (crawler_id, document_id, url) 
+                                VALUES (?,?,?)''', (self.crawler_id, doc_id, url))
+
         return doc_id
     
     def _fix_url(self, curr_url, rel):
@@ -204,17 +245,7 @@ class crawler(object):
         When a page contains multiple links to a document, 
         only the first link should be counted. """
         
-        # initialize the outgoing_links_set of from_doc_id if it doesn't exist
-        if self.document_index[from_doc_id].outgoing_links_set == None:
-            self.document_index[from_doc_id].outgoing_links_set = set()
-        # add to_doc_id to outgoing_links_set of from_doc_id
-        self.document_index[from_doc_id].outgoing_links_set.add(to_doc_id)
-
-        # initialize the incoming_links_set of to_doc_id if it doesn't exist
-        if self.document_index[to_doc_id].incoming_links_set == None:
-            self.document_index[to_doc_id].incoming_links_set = set()
-        # add from_doc_id to incoming_links_set of to_doc_id
-        self.document_index[to_doc_id].incoming_links_set.add(from_doc_id)
+        self.links.add((self.crawler_id, from_doc_id, to_doc_id))
 
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
@@ -226,6 +257,10 @@ class crawler(object):
 
         # update document title for document id self._curr_doc_id
         self.document_index[self._curr_doc_id].title = title_text
+
+        # insert into database
+        self.db_cursor.execute('''UPDATE document_index SET title = ? WHERE crawler_id = ? AND document_id = ? ''', 
+                                (title_text, self.crawler_id, self._curr_doc_id))
     
     def _visit_a(self, elem):
         """Called when visiting <a> tags."""
@@ -269,7 +304,11 @@ class crawler(object):
                 if chunk:
                     short_description.append(chunk)
                     line_counter += 1
-            self.document_index[self.document_id(dest_url)].title = "\n".join(short_description)
+            self.document_index[self.document_id(dest_url)].short_description = "\n".join(short_description)
+
+            # insert into database
+            self.db_cursor.execute('''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? ''', 
+                                    ("\n".join(short_description), self.crawler_id, self.document_id(dest_url)))
             
     def _add_words_to_document(self):
         # knowing self._curr_doc_id and the list of all words and their
@@ -409,7 +448,11 @@ class crawler(object):
                         if line_counter > 1:
                             short_description.append(chunk)
                         line_counter += 1
-                self.document_index[self._curr_doc_id].short_description = "\n".join(short_description)                
+                self.document_index[self._curr_doc_id].short_description = "\n".join(short_description)   
+
+                # insert into database
+                self.db_cursor.execute('''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? ''', 
+                                        ("\n".join(short_description), self.crawler_id, self._curr_doc_id))             
                 
                 print "    url="+repr(self._curr_url)
             
@@ -422,6 +465,17 @@ class crawler(object):
             finally:
                 if socket:
                     socket.close()
+
+        # insert into database
+        self.db_cursor.executemany("INSERT INTO links VALUES (?,?,?)", self.links)
+
+        # insert into database
+        for word_id in self.inverted_index: 
+            for document_id in self.inverted_index[word_id]: 
+                self.db_cursor.execute("INSERT INTO inverted_index VALUES (?,?,?)", (self.crawler_id, word_id, document_id))
+
+        # commit changes
+        self.db_conn.commit()
             
     def get_inverted_index(self):
         return self.inverted_index
@@ -442,11 +496,24 @@ class crawler(object):
 if __name__ == "__main__":    
     
     start = timer()
+    
+    db_conn = sqlite3.connect('example.db')
+    bot = crawler(db_conn, "urls.txt", 0, 4)
+    bot.crawl(depth=0)
 
-    bot = crawler(None, "urls.txt")
-    bot.crawl(depth=1)
+    # We can also close the connection if we are done with it.
+    # Just be sure any changes have been committed or they will be lost.
+    db_conn.close()
 
     end = timer()
+
+    print "time used: "
+    print (end - start)
+
+
+
+
+
 
     # code below is for testing
 
@@ -504,4 +571,4 @@ if __name__ == "__main__":
 
 
     
-    print(end - start)
+    

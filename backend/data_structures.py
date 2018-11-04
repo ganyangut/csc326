@@ -116,7 +116,7 @@ class DocumentIndex(OrderedDict):
 # a data structure for each entry in the document index
 class Document():    
     
-    def __init__(self, url="", depth=0, title="", short_description="", words=None, incoming_links_set=None, outgoing_links_set=None):
+    def __init__(self, url="", depth=0, title="", short_description="", words=None):
         if not isinstance(url, basestring):
             raise ValueError("document url must be a basestring")
         if not isinstance(depth, int):
@@ -129,30 +129,13 @@ class Document():
         self.depth = depth
         self.title = title
         self.short_description = short_description        
-        self.words = words
-        self.incoming_links_set = incoming_links_set
-        self.outgoing_links_set = outgoing_links_set        
+        self.words = words        
 
     def __repr__(self):
-        if self.words and self.incoming_links_set and self.outgoing_links_set:
-            return ", ".join([self.url, str(self.depth), self.title, self.short_description, 
-                    str(len(self.words)), str(len(self.incoming_links_set)), str(len(self.outgoing_links_set))])
+        if self.words:
+            return ", ".join([self.url, str(self.depth), self.title, self.short_description, str(len(self.words))])
         else:
             return ", ".join([self.url, str(self.depth), self.title, self.short_description, "", ""])
-
-# key is word id
-# value is word string
-class Lexicon(dict):    
-    
-    def __init__(self):
-        dict.__init__(self)
-
-    def __setitem__(self, key, val):
-        if not isinstance(key, int):
-            raise ValueError("lexicon key must be an int")
-        if not isinstance(val, basestring):
-            raise ValueError("lexicon value must be a basestring")
-        return dict.__setitem__(self, key, val)
 
 # key is word id
 # value is as set of document ids

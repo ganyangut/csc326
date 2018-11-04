@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-def page_rank(document_index, num_iterations=20, initial_pr=1.0):
+def page_rank(links, num_iterations=20, initial_pr=1.0):
     from collections import defaultdict
     import numpy as np
 
@@ -28,13 +28,15 @@ def page_rank(document_index, num_iterations=20, initial_pr=1.0):
     incoming_links = defaultdict(lambda: np.array([]))
     damping_factor = 0.85
 
-    for doc_id in document_index:
-        # convert each set of incoming links into a numpy array
-        if document_index[doc_id].incoming_links_set != None:
-            incoming_links[doc_id] = np.array([from_doc_id for from_doc_id in document_index[doc_id].incoming_links_set])
-        # collect the number of outbound links for every document
-        if document_index[doc_id].outgoing_links_set != None:
-            num_outgoing_links[doc_id] = len(document_index[doc_id].outgoing_links_set)
+    # collect the number of outbound links and the set of all incoming documents
+    # for every document
+    for (from_id,to_id) in links:
+        num_outgoing_links[int(from_id)] += 1.0
+        incoming_link_sets[to_id].add(int(from_id))
+    
+    # convert each set of incoming links into a numpy array
+    for doc_id in incoming_link_sets:
+        incoming_links[doc_id] = np.array([from_doc_id for from_doc_id in incoming_link_sets[doc_id]])
 
     num_documents = float(len(num_outgoing_links))
     lead = (1.0 - damping_factor) / num_documents
@@ -50,7 +52,5 @@ def page_rank(document_index, num_iterations=20, initial_pr=1.0):
     return page_rank
 
 if __name__ == "__main__":
-    #print page_rank([(1,2), (2, 4), (4, 3)])
-    #print page_rank([(1,2), (2, 4), (4, 3), (3, 1), (3, 2)])
-    #defaultdict(<function <lambda> at 0x7f781f91e140>, {1: 0.05000000000000001, 2: 0.09250000000000003, 4: 0.12862500000000002})
-    #defaultdict(<function <lambda> at 0x7f781f91e140>, {1: 0.1566791857202851, 2: 0.2898564935825274, 3: 0.2791899914185817, 4: 0.2838780195451483})
+    print page_rank([(1,2), (2, 4), (4, 3)])
+    print page_rank([(1,2), (2, 4), (4, 3), (3, 1), (3, 2)])
