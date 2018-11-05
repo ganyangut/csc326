@@ -1,4 +1,3 @@
-
 # Copyright (C) 2011 by Peter Goodman
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,8 +25,7 @@ from collections import defaultdict
 from data_structures import *
 import re
 import unicodedata
-import sqlite3 as lite
-from database import *
+import sqlite3
 
 from timeit import default_timer as timer
 
@@ -50,21 +48,50 @@ class crawler(object):
     This crawler keeps track of font sizes and makes it simpler to manage word
     ids and document ids."""
 
-    def __init__(self, db_conn, url_file):
+    def __init__(self, db_conn, url_file, crawler_id, total_threads):
         """Initialize the crawler with a connection to the database to populate
         and with the file containing the list of seed URLs to begin indexing."""
-        #self._db_conn = db_conn
-        #self._db_cursor = db_conn.cursor()
-        self.myDB=MyDatabase(db_conn)
+        
+        self.crawler_id = crawler_id
+        self.db_conn = db_conn
+        self.db_cursor = db_conn.cursor()
+        '''
+        # Create table
+        self.db_cursor.executescript("""
+                CREATE TABLE IF NOT EXISTS lexicon(
+                    crawler_id INTEGER,
+                    word_id INTEGER,
+                    word_string TEXT
+                );
+                CREATE TABLE IF NOT EXISTS inverted_index(
+                    crawler_id INTEGER,
+                    word_id INTEGER,
+                    document_id INTEGER,
+                    UNIQUE (crawler_id, word_id, document_id)
+                );
+                CREATE TABLE IF NOT EXISTS links(
+                    crawler_id INTEGER,
+                    from_document_id INTEGER,
+                    to_document_id INTEGER
+                );
+                CREATE TABLE IF NOT EXISTS document_index(
+                    crawler_id INTEGER,
+                    document_id INTEGER,
+                    url TEXT, 
+                    title TEXT, 
+                    short_description TEXT
+                );        
+                """)        
+        '''
+        self._url_queue = [ ]
+        self._doc_id_cache = { }
+        self._word_id_cache = { }
 
-        self._url_queue = []
-        self._doc_id_cache = {}
-        self._word_id_cache = {}
-
-        self.document_index = document_index()
-        self.inverted_index = inverted_index()
-        self.resolved_inverted_index = resolved_inverted_index()
-        self.lexicon = {}
+        self.document_index = DocumentIndex()
+        self.inverted_index = InvertedIndex()
+        self.resolved_inverted_index = ResolvedInvertedIndex()
+        self.lexicon = { }
+        self.links = set()
 
         # functions to call when entering and exiting specific tags
         self._enter = defaultdict(lambda *a, **ka: self._visit_ignore)
@@ -145,15 +172,8 @@ class crawler(object):
         doc_id = self._next_doc_id
         self._next_doc_id += 1
 
-        new_document = document(url=url)
-        #store document_index to data_structure
-        #self.document_index[ret_id] = new_document
-
-        #store document_index to db
-        self.myDB.insert_to_db_documentIndex(doc_id, new_document.url, new_document.depth, 
-                new_document.title, new_document.short_description, new_document.words, new_document.links)
-
-        return doc_id
+        new_document = Document(url=url)
+        self.document_index[ret_id] = new_document
 
     def _insert_word(self, word):
         """A function that inserts a word into the lexicon db table
@@ -169,6 +189,11 @@ class crawler(object):
 
         return word_id
 
+        # insert into database
+        self.db_cursor.execute("INSERT INTO lexicon VALUES (?,?,?)", (self.crawler_id, ret_id, word))
+
+        return ret_id
+    
     def word_id(self, word):
         """Get the word id of some specific word."""
         if word in self._word_id_cache:
@@ -182,14 +207,9 @@ class crawler(object):
             self._word_id_cache[word] = word_id
 
         # add the word to inverted index and resolved inverted index
-        #self.inverted_index.add(word_id, self._curr_doc_id)
-        #self.resolved_inverted_index.add(word, self._curr_url)
-
-        #add the word to inverted index and resolved inverted index
-        #store to db
-        self.myDB.insert_to_db_InvertedIndex(word_id,self._curr_doc_id)
-        self.myDB.insert_to_db_resolvedInvertedIndex(word,self._curr_url)
-
+        self.inverted_index.add(word_id, self._curr_doc_id)
+        self.resolved_inverted_index.add(word, self._curr_url)   
+        
         return word_id
 
     def document_id(self, url):
@@ -202,6 +222,11 @@ class crawler(object):
         # the rest to their defaults
         doc_id = self._insert_document(url)
         self._doc_id_cache[url] = doc_id
+
+        # insert into database
+        self.db_cursor.execute('''INSERT INTO document_index (crawler_id, document_id, url) 
+                                VALUES (?,?,?)''', (self.crawler_id, doc_id, url))
+
         return doc_id
 
     def _fix_url(self, curr_url, rel):
@@ -223,15 +248,11 @@ class crawler(object):
             return fixed_url
 
     def add_link(self, from_doc_id, to_doc_id):
-        """Add a link into the database, or increase the number of links between
-        two pages in the database."""
-        if self.document_index[from_doc_id].links == None:
-            self.document_index[from_doc_id].links = {}
-        # if the link exists in the db, increase the number
-        if to_doc_id in self.document_index[from_doc_id].links:
-            self.document_index[from_doc_id].links[to_doc_id] += 1
-        else:  # if the link doesn't exist in the db, add it
-            self.document_index[from_doc_id].links[to_doc_id] = 1
+        """Add a link into the database. 
+        When a page contains multiple links to a document, 
+        only the first link should be counted. """
+        
+        self.links.add((self.crawler_id, from_doc_id, to_doc_id))
 
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
@@ -245,6 +266,10 @@ class crawler(object):
         # update document title for document id self._curr_doc_id
         self.document_index[self._curr_doc_id].title = title_text
 
+        # insert into database
+        self.db_cursor.execute('''UPDATE document_index SET title = ? WHERE crawler_id = ? AND document_id = ? ''', 
+                                (title_text, self.crawler_id, self._curr_doc_id))
+    
     def _visit_a(self, elem):
         """Called when visiting <a> tags."""
 
@@ -291,9 +316,12 @@ class crawler(object):
                 if chunk:
                     short_description.append(chunk)
                     line_counter += 1
-            self.document_index[self.document_id(
-                dest_url)].title = "\n".join(short_description)
+            self.document_index[self.document_id(dest_url)].short_description = "\n".join(short_description)
 
+            # insert into database
+            self.db_cursor.execute('''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? ''', 
+                                    ("\n".join(short_description), self.crawler_id, self.document_id(dest_url)))
+            
     def _add_words_to_document(self):
         # knowing self._curr_doc_id and the list of all words and their
         # font sizes (in self._curr_words), add all the words into the
@@ -435,9 +463,12 @@ class crawler(object):
                         if line_counter > 1:
                             short_description.append(chunk)
                         line_counter += 1
-                self.document_index[self._curr_doc_id].short_description = "\n".join(
-                    short_description)
+                self.document_index[self._curr_doc_id].short_description = "\n".join(short_description)   
 
+                # insert into database
+                self.db_cursor.execute('''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? ''', 
+                                        ("\n".join(short_description), self.crawler_id, self._curr_doc_id))             
+                
                 print "    url="+repr(self._curr_url)
 
             except Exception as e:
@@ -450,6 +481,17 @@ class crawler(object):
                 if socket:
                     socket.close()
 
+        # insert into database
+        self.db_cursor.executemany("INSERT INTO links VALUES (?,?,?)", self.links)
+
+        # insert into database
+        for word_id in self.inverted_index: 
+            for document_id in self.inverted_index[word_id]: 
+                self.db_cursor.execute("INSERT INTO inverted_index VALUES (?,?,?)", (self.crawler_id, word_id, document_id))
+
+        # commit changes
+        self.db_conn.commit()
+            
     def get_inverted_index(self):
         return self.inverted_index
 
@@ -466,88 +508,51 @@ class crawler(object):
             raise KeyError("doc_id not valid")
         return self.document_index[doc_id].short_description
 
-    def _disconnect_db(self):
-        self.myDB.disconnect_db()
-
-    '''
-    # lab3
-    # create database tables
-    def _init_db_tables(self):
-        cursor = self._db_cursor
-        if cursor:
-            cursor.execute(
-                "CREATE TABLE IF NOT EXISTS documentIndex(doc_id integer, url text, depth integer, title text, short_description text,words text, links text, PRIMARY KEY(doc_id));"
-            )
-            cursor.execute(
-                "CREATE TABLE IF NOT EXISTS links(destination_url_id integer,occurrence_number integer,PRIMARY KEY(destination_url_id))"
-            )
-            cursor.execute(
-                "CREATE TABLE IF NOT EXISTS lexicon(word_id integer, words text, PRIMARY KEY(word_id))"
-            )
-            cursor.execute(
-                "CREATE TABLE IF NOT EXISTS invertedIndex(word_id integer,doc_id integer,PRIMARY KEY(word_id))"
-            )
-            cursor.execute(
-                "CREATE TABLE IF NOT EXISTS resolvedInvertedIndex(words text, document_url text)"
-            )
-            cursor.execute(
-                "CREATE TABLE IF NOT EXISTS pageRank(doc_id integer,rank_score real, PRIMARY KEY(doc_id))"
-            )
-
-    def _insert_to_db_documentIndex(self, doc_id, url, depth, title, short_description, words, links):
-        cursor = self._db_cursor
-        if cursor:
-            try:
-                cursor.execute(
-                    "INSERT INTO documentIndex VALUES(?,?,?,?,?,?,?)",
-                    doc_id, url, depth, title, short_description, words, links
-                )
-            except lite.Error as e:
-                raise e
-
-    def _disconnect_db(self):
-        self._db_conn.commit()
-        self._db_conn.close()
-    '''
-
-if __name__ == "__main__":
-
+if __name__ == "__main__":    
+    
     start = timer()
-    db_conn = lite.connect("dbFile.db")
-    bot = crawler(db_conn, "urls.txt")
-    bot.crawl(depth=1)
-    #bot._disconnect_db()
-    end = timer()
-'''
-    Lab1
-    bot = crawler(None, "urls.txt")
-    bot.crawl(depth=1)
+    
+    db_conn = sqlite3.connect('example.db')
+    bot = crawler(db_conn, "urls.txt", 0, 4)
+    bot.crawl(depth=0)
+
+    # We can also close the connection if we are done with it.
+    # Just be sure any changes have been committed or they will be lost.
+    db_conn.close()
 
     end = timer()
-'''
-# code below is for testing
 
-# bot.crawl(depth=0)
+    print "time used: "
+    print (end - start)
 
-# print bot._url_queue
-# print bot._doc_id_cache
-# print bot._word_id_cache
-# print bot.document_index
-# print bot.inverted_index
-# print bot.resolved_inverted_index
-# print "lexicon: "
-# print bot.lexicon
 
-# print bot.get_inverted_index()
-# print bot.get_resolved_inverted_index()
-# print bot.get_title(35)
-# print bot.get_short_description(35)
 
-# print "words: "
-# print bot.document_index[1].words
-# print "links: "
-# print bot.document_index[35].links
-'''
+
+
+
+    # code below is for testing
+
+    #bot.crawl(depth=0)
+    
+    #print bot._url_queue
+    #print bot._doc_id_cache
+    #print bot._word_id_cache
+    #print bot.document_index
+    #print bot.inverted_index
+    #print bot.resolved_inverted_index
+    #print "lexicon: "
+    #print bot.lexicon
+    
+    #print bot.get_inverted_index()
+    #print bot.get_resolved_inverted_index()
+    #print bot.get_title(35)
+    #print bot.get_short_description(35)
+    
+    #print "words: "
+    #print bot.document_index[1].words
+    #print "links: "
+    #print bot.document_index[35].links
+    '''
     for doc_id in bot.document_index:
         #if bot.document_index[doc_id].depth <= 1:
         print "url: " + bot.document_index[doc_id].url
@@ -579,4 +584,6 @@ if __name__ == "__main__":
     title = bot.get_title(2)
     '''
 
-print(end - start)
+
+    
+    

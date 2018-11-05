@@ -20,19 +20,6 @@ class UserHistoryIndex(dict):
         self[_email] = History()
         return self[_email]
 
-'''
-    def add_new_user_history(self, _email, _history):
-        if not isinstance(_history, History):
-            raise ValueError("user value must be a history")
-        if _email in self.keys():
-            raise KeyError ('user alreay exits')
-        if not _email in self.keys():
-            raise KeyError("user not found")
-        self[_email]=_history
-    
-    def destory(self):
-        self.clear()
-'''
 class History(OrderedDict):    
     
     def __init__(self):
@@ -70,10 +57,6 @@ class History(OrderedDict):
     def make_keywords_old(self):        
         for keyword in self:
             self[keyword] = (self[keyword][0],self[keyword][1]+1)
-    
-    def get_last(self):
-        last = next(reversed(self))
-        return (last,self[last])
     
     # get up to 20 popular keywords in history
     def get_popular(self):        
@@ -118,7 +101,7 @@ class RecentWords(list):
 
 # key is document id
 # value is document
-class document_index(OrderedDict):    
+class DocumentIndex(OrderedDict):    
     
     def __init__(self):
         OrderedDict.__init__(self)
@@ -126,14 +109,14 @@ class document_index(OrderedDict):
     def __setitem__(self, key, val):
         if not isinstance(key, int):
             raise ValueError("document_index key must be an int")
-        if not isinstance(val, document):
+        if not isinstance(val, Document):
             raise ValueError("document_index value must be a document")
         return OrderedDict.__setitem__(self, key, val)
 
 # a data structure for each entry in the document index
-class document():    
+class Document():    
     
-    def __init__(self, url="", depth=0, title="", short_description="", words=None, links=None):
+    def __init__(self, url="", depth=0, title="", short_description="", words=None):
         if not isinstance(url, basestring):
             raise ValueError("document url must be a basestring")
         if not isinstance(depth, int):
@@ -146,46 +129,17 @@ class document():
         self.depth = depth
         self.title = title
         self.short_description = short_description        
-        self.words = words
-        self.links = links
+        self.words = words        
 
     def __repr__(self):
-        if self.words and self.links:
-            return ", ".join([self.url, str(self.depth), self.title, self.short_description, str(len(self.words)), str(len(self.links))])
+        if self.words:
+            return ", ".join([self.url, str(self.depth), self.title, self.short_description, str(len(self.words))])
         else:
             return ", ".join([self.url, str(self.depth), self.title, self.short_description, "", ""])
 
-# key is destination url id
-# value is how many times we see this link
-class links_(dict):    
-    
-    def __init__(self):
-        dict.__init__(self)
-
-    def __setitem__(self, key, val):
-        if not isinstance(key, int):
-            raise ValueError("links_ key must be an int")
-        if not isinstance(val, int):
-            raise ValueError("links_ value must be an int")
-        return dict.__setitem__(self, key, val)
-
-# key is word id
-# value is word string
-class lexicon(dict):    
-    
-    def __init__(self):
-        dict.__init__(self)
-
-    def __setitem__(self, key, val):
-        if not isinstance(key, int):
-            raise ValueError("lexicon key must be an int")
-        if not isinstance(val, basestring):
-            raise ValueError("lexicon value must be a basestring")
-        return dict.__setitem__(self, key, val)
-
 # key is word id
 # value is as set of document ids
-class inverted_index(dict):    
+class InvertedIndex(dict):    
     
     def __init__(self):
         dict.__init__(self)
@@ -210,7 +164,7 @@ class inverted_index(dict):
 
 # key is word string
 # value is as set of document urls
-class resolved_inverted_index(dict):    
+class ResolvedInvertedIndex(dict):    
     
     def __init__(self):
         dict.__init__(self)

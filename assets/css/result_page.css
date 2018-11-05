@@ -43,7 +43,6 @@ div.search_bar{
     background-color:  #11acbd;
 }
 
-
 h1{
     background: linear-gradient(to right, #11acbd , #fff);
     position: relative;
@@ -57,7 +56,6 @@ h1{
 h2, h3{
     background-color: white;
 }
-
 
 div.column{
     float: left;
@@ -98,7 +96,6 @@ tr{
     background-color: #f1f1f1;
 }
 
-
 th{
     background-color: white;
     border: 1px solid black;
@@ -108,6 +105,3 @@ td{
     background-color: white;
     border-right:1px solid black;
 }
-
-
-
