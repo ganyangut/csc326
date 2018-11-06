@@ -3,10 +3,10 @@ from crawler import *
 from pagerank import *
 import os
 import difflib
-
+from static_variables import StaticVar
 num_threads = 1
 
-database_file = 'persistent_storage.db'
+database_file = StaticVar.database_file
 if os.path.isfile(database_file):
     os.remove(database_file)
 

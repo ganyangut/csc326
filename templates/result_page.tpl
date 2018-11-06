@@ -62,8 +62,8 @@
 
         % if keywords.strip() != '':
             % if len(words_count) > 1 or next(iter(words_count.values())) > 1:
-            <div class="column">    
-                <table id="results">
+            <!--div class="column"-->    
+                <table id="results" class="column1">
                     <tr>
                         <th id="th1" colspan="2" style="font-size:20px">Words Breakdown</th>
                     </tr> 
@@ -78,7 +78,7 @@
                     </tr>
                     %end
                 </table>
-            </div>
+            <!--/div-->
             %end
         %end
 
@@ -86,8 +86,8 @@
             and the total number of times that these words have been searched.
         -->
         % if history:
-        <div class="column">                
-            <table id="history">
+        <!--div class="column"-->                
+            <table id="history" class="column1">
                 <tr>
                     <th colspan="2" style="font-size:20px">Search History</th>
                 </tr>
@@ -102,8 +102,26 @@
                 </tr>
                 %end
             </table>    
-        </div>
+        <!--/div-->
         %end
+
+        <table id = "urls" class="column2">
+                <tr>
+                    <th colspan="3" style="font-size:20px">Urls sorted by PageRank scores</th>
+                </tr>
+                <tr>
+                    <th>urls</th>
+                    <th>title</th>
+                    <th>short_description</th>
+                </tr>
+                % for entry in document:
+               <tr>
+                    <td>{{entry[0]}}</td>                
+                    <td>{{entry[1]}}</td>
+                    <td>{{entry[2]}}</td>
+                </tr>
+               %end
+        </table>
     </div>
 
 

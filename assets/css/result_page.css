@@ -56,10 +56,21 @@ h1{
 h2, h3{
     background-color: white;
 }
-
-div.column{
+div.row{
+    float: left;
+    position: relative;
+}
+.column1{
     float: left;
     width: 40%;
+    padding: 15px;   
+    position: relative;
+    top:240px;
+    left:30px;
+}
+.column2{
+    float: left;
+    width: 90%;
     padding: 15px;   
     position: relative;
     top:240px;
@@ -103,5 +114,5 @@ th{
 
 td{
     background-color: white;
-    border-right:1px solid black;
+    border:1px solid black;
 }

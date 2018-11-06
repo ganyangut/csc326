@@ -3,8 +3,11 @@ import operator
 import json
 import httplib2
 import requests
-
+import os
+import sqlite3 as lite
+from backend.static_variables import StaticVar
 from backend.data_structures import UserHistoryIndex, History, UserRecentWordsIndex, RecentWords
+from backend.database import MyDatabase
 
 from bottle import Bottle, route, run, template, get, post, request, static_file, redirect, app
 from oauth2client.client import OAuth2WebServerFlow, flow_from_clientsecrets
@@ -19,15 +22,68 @@ user_recent_words_index = UserRecentWordsIndex()
 current_page = 'query_page'
 keywords = ''
 words_count = []
-SCOPE = 'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email'
-REDIRECT_URI = 'http://localhost:8081/redirect'
-sessions_opts = {
-    'session.type': 'file',
-    'session.cookie_expires': 300,
-    'session.data_dir': './data',
-    'session.auto': True
-}
+SCOPE = StaticVar.SCOPE
+REDIRECT_URI = StaticVar.REDIRECT_URI
+sessions_opts = StaticVar.sessions_opts
+database_file = 'backend/'+StaticVar.database_file
+# lab3 only
+history = History()
 
+# lab3 witout log in
+#myDB = MyDatabase()
+
+@get('/')  # or @route('/')
+def home():
+    print "------route---home------------------------------"
+    return template('./templates/query_page.tpl', login=False, history=history)
+
+# show search results, word count, and search history
+
+
+@post('/')  # or @route('/', method='POST')
+def show_results():
+
+    # keyword from http get
+    global keywords
+    global words_count
+    keywords = request.forms.get('keywords')
+    # split keyword string into words and count them
+    # store words in a dict
+    words_list = keywords.split()
+    words_count = {word: words_list.count(word) for word in words_list}
+
+    first_word = words_list[0]
+    print "first_word: "+repr(first_word)+"\n"
+
+    db_conn = lite.connect(database_file)
+    #global myDB
+    myDB = MyDatabase(db_conn)
+
+    word_id=myDB.select_word_id_from_lexicon(first_word)
+    print "word_id: "
+    print word_id
+    document_id=myDB.select_document_id_from_InvertedIndex(word_id)
+    print "document_id: "
+    print document_id
+    sorted_document_id = myDB.select_document_id_from_PageRank(document_id)
+    print "sorted_document_id: "
+    print sorted_document_id
+    document = myDB.select_document_from_DocumentIndex(sorted_document_id)
+    print "document: "
+    print document
+
+    db_conn.commit()
+    db_conn.close()
+
+    # add keyword to history
+    # joining words instead of the original string to avoid multiple whitespaces
+
+    return template('./templates/result_page.tpl', keywords=keywords, words_count=words_count,
+                    login=False, history=history, document = document)
+
+
+'''
+#LAB2 with google log in
 # ask for keywords from user
 @get('/')  # or @route('/')
 def home():
@@ -116,11 +172,11 @@ def google_logout():
 
     return redirect('/')
 
-'''
-If user authorizes your application server to access the Google services, an one-time code will be attached
-to the query string when the browser is redirected to the redirect_uri specified in step 2. 
-The one-time code can be retrieved as GET parameter:
-'''
+
+#If user authorizes your application server to access the Google services, an one-time code will be attached
+#to the query string when the browser is redirected to the redirect_uri specified in step 2. 
+#The one-time code can be retrieved as GET parameter:
+
 @route('/redirect')
 def redirect_page():
     print "------route---redirect------------------------------"
@@ -178,6 +234,8 @@ def user_login():
         return template('./templates/result_page.tpl', keywords = keywords, words_count = words_count, login = True, 
             user_email = session["user_email"], recent_words = user_recent_words_index.get_recent_words(session["user_email"]),
             history = user_history_index.get_history(session["user_email"]).get_popular())
+'''
+
 
 # routes of assets (css, js, images)
 @route('/assets/<filename:path>')
@@ -185,9 +243,12 @@ def send_assets(filename):
     return static_file(filename, root='./assets')
 
 # route of templates
+
+
 @route('/templates/<filename:path>')
 def send_templates(filename):
     return static_file(filename, root='./templates')
+
 
 if __name__ == "__main__":
     app = SessionMiddleware(app(), sessions_opts)

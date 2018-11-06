@@ -2,11 +2,11 @@
 # create database tables
 
 import sqlite3 as lite
+from static_variables import StaticVar
 
+class MyDatabase:
 
-class MyDatabase():
-
-    def _init_(self, db_conn):
+    def __init__(self,db_conn):
         self._db_conn = db_conn
         self._cursor = db_conn.cursor()
 
@@ -33,90 +33,64 @@ class MyDatabase():
                 "CREATE TABLE IF NOT EXISTS pageRank(doc_id integer,rank_score real, PRIMARY KEY(doc_id))"
             )
 
-    def add_link(self, from_doc_id, to_doc_id):
-        """Add a link into the database, or increase the number of links between
-        two pages in the database."""
-        sql_get_link = "SELECT occurrence_number from documentIndex where doc_id=%s and link =%s"
-        params = []
-        params.append(from_doc_id)
-        params.append(to_doc_id)
-
-        self._cursor.execute(sqlString, tuple(params))
-        row = self._cursor.fetchone()
-
-        if row!='':
-            occ_num=int(row)+1
-            sql_ocurrence_number_plus_one="UPDATE documentIndex SET ocurrence_number=%s"
-
-        if self.document_index[from_doc_id].links == None:
-            self.document_index[from_doc_id].links = {}
-        # if the link exists in the db, increase the number
-        if to_doc_id in self.document_index[from_doc_id].links:
-            self.document_index[from_doc_id].links[to_doc_id] += 1
-        else:  # if the link doesn't exist in the db, add it
-            self.document_index[from_doc_id].links[to_doc_id] = 1
-
-    def insert_to_db_documentIndex(self, doc_id, url, depth, title, short_description, words, link):
+    def select_word_id_from_lexicon(self, word_string):
         if self._cursor:
             try:
-                self._cursor.execute(
-                    "INSERT INTO documentIndex VALUES(?,?,?,?,?,?,?)",
-                    doc_id, url, depth, title, short_description, words, link
-                )
-            except lite.Error as e:
-                raise e
-    '''
-    def insert_to_db_links(self, destination_url_id, occurrence_number):
-        if self._cursor:
-            try:
-                self._cursor.execute(
-                    "INSERT INTO documentIndex VALUES(?,?)",
-                    destination_url_id, occurrence_number
-                )
-            except lite.Error as e:
-                raise e
-    ''''
-
-    def insert_to_db_lexicon(self, word_id, word):
-        if self._cursor:
-            try:
-                self._cursor.execute(
-                    "INSERT INTO documentIndex VALUES(?,?)",
-                    word_id, word
-                )
+                #word_id = []
+                #for word in word_string:
+                #print "word: "+repr(word)
+                self._cursor.execute( "SELECT word_id FROM lexicon where word_string = ?", (word_string,))
+                word_id = self._cursor.fetchall()
+                #print "word_id: "+repr(word_id)
+                return word_id
             except lite.Error as e:
                 raise e
 
-    def insert_to_db_InvertedIndex(self, word_id, doc_id):
+    def select_document_id_from_InvertedIndex(self, word_id):
         if self._cursor:
             try:
-                self._cursor.execute(
-                    "INSERT INTO documentIndex VALUES(?,?)",
-                    word_id, doc_id
-                )
+                document_id = []
+                for id in word_id:
+                    #print "id: "+repr(id)
+                    self._cursor.execute("SELECT document_id FROM inverted_index where word_id = ?", id)
+                    document_id = self._cursor.fetchall()
+                    #print "doc_id: "+repr(document_id)
+                return document_id
             except lite.Error as e:
                 raise e
 
-    def insert_to_db_resolvedInvertedIndex(self, word, document_url):
+    def select_document_id_from_PageRank(self, document_id):
         if self._cursor:
             try:
-                self._cursor.execute(
-                    "INSERT INTO documentIndex VALUES(?,?)",
-                    word, document_url
-                )
+                page_rank={}
+                sorted_document_id = []
+                for id in document_id:
+                    print "page_rank ----- id: "+repr(id)
+                    self._cursor.execute( "SELECT rank_value, document_id FROM page_rank where document_id = ?", id)
+                    temp_page_rank = self._cursor.fetchall()
+                    page_rank[temp_page_rank[0][0]]=temp_page_rank[0][1]
+                    print "temp_page_rank: "+repr(temp_page_rank)
+                keys=page_rank.keys()
+                keys.sort(reverse=True)
+                sorted_document_id = map(page_rank.get,keys)
+                return sorted_document_id
             except lite.Error as e:
                 raise e
 
-    def insert_to_db_pageRank(self, doc_id, rank_score):
+    def select_document_from_DocumentIndex(self, document_id):
         if self._cursor:
-        try:
-                self._cursor.execute(
-                    "INSERT INTO documentIndex VALUES(?,?)",
-                    doc_id, rank_score
-                )
+            try:
+                document = []
+                for id in document_id:
+                    print "document index ------- id: "+repr(id)
+                    self._cursor.execute("SELECT url, title, short_description FROM document_index where document_id = ?", (id,))
+                    document = document + self._cursor.fetchall()
+                    print "document index ----- document: "+repr(document)
+                return document
             except lite.Error as e:
                 raise e
-    
+
+
     def disconnect_db(self):
         self._db_conn.commit()
         self._db_conn.close()
