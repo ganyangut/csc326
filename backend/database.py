@@ -90,7 +90,18 @@ class MyDatabase:
             except lite.Error as e:
                 raise e
 
-
+    def select_doc_id_with_links_from_Link(self,document_id):
+        if self._cursor:
+            try:
+                self._cursor.execute("SELECT from_document_id FROM links")
+                from_document_id=self._cursor.fetchall()
+                for id in document_id:
+                    if id not in from_document_id:
+                        document_id.remove(id)
+                return document_id
+            except lite.Error as e:
+                raise e
+                    
     def disconnect_db(self):
         self._db_conn.commit()
         self._db_conn.close()

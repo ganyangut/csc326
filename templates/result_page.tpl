@@ -28,7 +28,7 @@
     %end
 
     <!-- form with a input box and a search button -->
-    <div class="search_bar">
+
         <form id="search_form" action="/" method="post" >
             <input id="input_box" name="keywords" type="text" placeholder=" Here he is! Type here to do another search. ">            
             <input id="search_button" value="Waldoge Search" type="submit">
@@ -48,7 +48,7 @@
                 </table>
             %end
         </form>
-    </div>
+
     
     <!--if input is empty do nothing-->
     % if keywords.strip() != '':
@@ -106,6 +106,7 @@
         %end
 
         <table id = "urls" class="column2">
+                %if document:
                 <tr>
                     <th colspan="3" style="font-size:20px">Urls sorted by PageRank scores</th>
                 </tr>
@@ -115,12 +116,18 @@
                     <th>short_description</th>
                 </tr>
                 % for entry in document:
-               <tr>
-                    <td>{{entry[0]}}</td>                
+                <tr>
+                    <td><a href={{entry[0]}}>{{entry[0]}}</a></td>                
                     <td>{{entry[1]}}</td>
                     <td>{{entry[2]}}</td>
                 </tr>
-               %end
+                %end
+                %else:
+                <tr>
+                    <th style="font-size:20px">    No urls found    </th>
+                <tr>
+                %end
+
         </table>
     </div>
 

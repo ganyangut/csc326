@@ -18,10 +18,12 @@ body{
     border-radius: 90px;
     font-size: 14px;
 }
-div.search_bar{
+#search_form{
     position: relative;
-    top:100px;
-    left:600px;
+    left:20px;
+    text-align: center;
+    margin: 10px;
+    padding: 10px;
 }
 
 #input_box{
@@ -46,7 +48,7 @@ div.search_bar{
 h1{
     background: linear-gradient(to right, #11acbd , #fff);
     position: relative;
-    top: 200px;
+    top: 10px;
     left: 30px;
     margin: -5px 15px 20px 10px;
     padding: 3px 30px 3px 20px;
@@ -65,7 +67,7 @@ div.row{
     width: 40%;
     padding: 15px;   
     position: relative;
-    top:240px;
+    top:20px;
     left:30px;
 }
 .column2{
@@ -73,7 +75,7 @@ div.row{
     width: 90%;
     padding: 15px;   
     position: relative;
-    top:240px;
+    top:20px;
     left:30px;
 }
 
