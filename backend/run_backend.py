@@ -9,7 +9,7 @@ def run_crawler(database_file, url_file, crawler_id, number_processes):
     bot = crawler(database_file, url_file, crawler_id, number_processes)
     bot.crawl(depth=1)
 
-number_processes = 1
+number_processes = 3
 database_file_integrated = "persistent_storage.db"
 
 
