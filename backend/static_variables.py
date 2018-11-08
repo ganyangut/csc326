@@ -9,3 +9,5 @@ class StaticVar():
         'session.data_dir': './data',
         'session.auto': True
     }
+    num_per_page = 2
+    homepageUrl = "http://localhost:8081/"

@@ -107,14 +107,15 @@ table{
 tr{
     height: 40px;
     background-color: #f1f1f1;
+    border: 1px solid black;
 }
 
 th{
     background-color: white;
-    border: 1px solid black;
 }
 
 td{
     background-color: white;
     border:1px solid black;
 }
+
