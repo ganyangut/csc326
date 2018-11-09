@@ -107,7 +107,7 @@ def search_first_word(keyword,page_no):
 
     return template('./templates/result_page.tpl', keywords=keywords, words_count=words_count,
                     login=False, history=history, first_word=first_word, document=document, cur_page_num=cur_page_num,
-                    num_per_page=num_per_page, page_num_counts=page_num_counts,homepageUrl=homepageUrl)
+                    num_per_page=num_per_page, page_num_counts=page_num_counts)
 
 
 def pagination(url_counts):
