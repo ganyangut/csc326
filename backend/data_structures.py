@@ -46,7 +46,7 @@ class History(OrderedDict):
     def sort(self):
         # sort key word by "number of times searched" first
         # if "number of times searched" is the same, rank depends on "how recent the keyword is searched"
-        temp = OrderedDict(sorted(self.items(), key = lambda entry : (-entry[1][0], entry[1][1])))
+        temp = OrderedDict(sorted(self.items(), key = lambda entry: (-entry[1][0], entry[1][1])))
         
         # assignment to self is not allowed, so we need to clear and add entries one by one 
         self.clear()        

@@ -478,8 +478,9 @@ class crawler(object):
                 self.db_cursor.execute("INSERT INTO inverted_index VALUES (?,?,?)", (self.crawler_id, word_id, document_id))
 
         page_rank_dict = page_rank(self.links)
-        for document_id in page_rank_dict:
-            self.db_cursor.execute('''INSERT INTO page_rank VALUES (?,?,?)''', (self.crawler_id, document_id, page_rank_dict[document_id]))
+        page_rank_dict = sorted(page_rank_dict.items(), key = lambda x: -x[1])
+        for (document_id, rank_value) in page_rank_dict:
+            self.db_cursor.execute('''INSERT INTO page_rank VALUES (?,?,?)''', (self.crawler_id, document_id, rank_value))
         
         # commit changes
         self.db_conn.commit()
