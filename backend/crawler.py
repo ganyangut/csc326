@@ -23,6 +23,7 @@ import urlparse
 from BeautifulSoup import *
 from collections import defaultdict
 from data_structures import *
+from pagerank import *
 import re
 import unicodedata
 import sqlite3
@@ -45,14 +46,14 @@ class crawler(object):
     This crawler keeps track of font sizes and makes it simpler to manage word
     ids and document ids."""
 
-    def __init__(self, db_conn, url_file, crawler_id, total_threads):
+    def __init__(self, database_file, url_file, crawler_id, number_processes):
         """Initialize the crawler with a connection to the database to populate
         and with the file containing the list of seed URLs to begin indexing."""
         
         self.crawler_id = crawler_id
-        self.db_conn = db_conn
-        self.db_cursor = db_conn.cursor()
-        '''
+        
+        self.db_conn = sqlite3.connect(database_file)
+        self.db_cursor = self.db_conn.cursor()
         # Create table
         self.db_cursor.executescript("""
                 CREATE TABLE IF NOT EXISTS lexicon(
@@ -66,20 +67,21 @@ class crawler(object):
                     document_id INTEGER,
                     UNIQUE (crawler_id, word_id, document_id)
                 );
-                CREATE TABLE IF NOT EXISTS links(
-                    crawler_id INTEGER,
-                    from_document_id INTEGER,
-                    to_document_id INTEGER
-                );
                 CREATE TABLE IF NOT EXISTS document_index(
                     crawler_id INTEGER,
                     document_id INTEGER,
                     url TEXT, 
                     title TEXT, 
                     short_description TEXT
-                );        
-                """)        
-        '''
+                );     
+                CREATE TABLE IF NOT EXISTS page_rank(
+                    crawler_id INTEGER,
+                    document_id INTEGER,
+                    rank_value REAL
+                );    
+                """) 
+        self.db_conn.commit()
+
         self._url_queue = [ ]
         self._doc_id_cache = { }
         self._word_id_cache = { }
@@ -154,10 +156,13 @@ class crawler(object):
         self._curr_words = None
 
         # get all urls into the queue
+        line_counter = 0        
         try:
             with open(url_file, 'r') as f:
                 for line in f:
-                    self._url_queue.append((self._fix_url(line.strip(), ""), 0))
+                    if line_counter % number_processes == crawler_id:
+                        self._url_queue.append((self._fix_url(line.strip(), ""), 0))                        
+                    line_counter += 1
         except IOError:
             pass
     
@@ -244,7 +249,7 @@ class crawler(object):
         When a page contains multiple links to a document, 
         only the first link should be counted. """
         
-        self.links.add((self.crawler_id, from_doc_id, to_doc_id))
+        self.links.add((from_doc_id, to_doc_id))
 
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
@@ -252,7 +257,8 @@ class crawler(object):
         # change unicode string to ascii string
         title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
 
-        print "document title="+ repr(title_text)
+        #print "crawler id="+ repr(self.crawler_id)
+        #print "document title="+ repr(title_text)
 
         # update document title for document id self._curr_doc_id
         self.document_index[self._curr_doc_id].title = title_text
@@ -314,7 +320,7 @@ class crawler(object):
         # font sizes (in self._curr_words), add all the words into the
         # database for this document
         self.document_index[self._curr_doc_id].words = self._curr_words
-        print "    num words="+ str(len(self._curr_words))
+        #print "    num words="+ str(len(self._curr_words))
 
     def _increase_font_factor(self, factor):
         """Increade/decrease the current font size."""
@@ -453,7 +459,7 @@ class crawler(object):
                 self.db_cursor.execute('''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? ''', 
                                         ("\n".join(short_description), self.crawler_id, self._curr_doc_id))             
                 
-                print "    url="+repr(self._curr_url)
+                #print "    url="+repr(self._curr_url)
             
             except Exception as e:
                 print "Exception as e:"
@@ -464,17 +470,20 @@ class crawler(object):
             finally:
                 if socket:
                     socket.close()
-
-        # insert into database
-        self.db_cursor.executemany("INSERT INTO links VALUES (?,?,?)", self.links)
-
+  
         # insert into database
         for word_id in self.inverted_index: 
             for document_id in self.inverted_index[word_id]: 
                 self.db_cursor.execute("INSERT INTO inverted_index VALUES (?,?,?)", (self.crawler_id, word_id, document_id))
 
+        page_rank_dict = page_rank(self.links)
+        page_rank_dict = sorted(page_rank_dict.items(), key = lambda x: -x[1])
+        for (document_id, rank_value) in page_rank_dict:
+            self.db_cursor.execute('''INSERT INTO page_rank VALUES (?,?,?)''', (self.crawler_id, document_id, rank_value))
+        
         # commit changes
         self.db_conn.commit()
+        self.db_conn.close()
             
     def get_inverted_index(self):
         return self.inverted_index

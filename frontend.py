@@ -280,19 +280,15 @@ def user_login():
             history = user_history_index.get_history(session["user_email"]).get_popular())
 '''
 
-
 # routes of assets (css, js, images)
 @route('/assets/<filename:path>')
 def send_assets(filename):
     return static_file(filename, root='./assets')
 
 # route of templates
-
-
 @route('/templates/<filename:path>')
 def send_templates(filename):
     return static_file(filename, root='./templates')
-
 
 if __name__ == "__main__":
     app = SessionMiddleware(app(), sessions_opts)
