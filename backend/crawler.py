@@ -43,7 +43,6 @@ WORD_SEPARATORS = re.compile(r'\s|\n|\r|\t|[^a-zA-Z0-9\-_]')
 class crawler(object):
     """Represents 'Googlebot'. Populates a database by crawling and indexing
     a subset of the Internet.
-
     This crawler keeps track of font sizes and makes it simpler to manage word
     ids and document ids."""
 
@@ -563,18 +562,13 @@ if __name__ == "__main__":
     bot._curr_words = []
     bot.document_id("url: a")
     bot.document_id("url: b")
-
-
     bot.word_id("wordc")
     bot.word_id("wordd")
-
     print bot._curr_words
     print bot.document_index
-
     indexexample =  ({1: set([1, 2]), 2: set([1, 3])})
     print indexexample
     
-
     title = bot.get_title(2)
     '''
 

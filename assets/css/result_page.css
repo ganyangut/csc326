@@ -1,12 +1,12 @@
-body{
+/*body{
     background: url("../../assets/image/waldoge_1.jpg") no-repeat center center fixed;
     background-size: cover;
 }
-
+*/
 #login_form{
     top: 0px;
     right: 20px;
-    height: 80px;
+   /* height: 80px;*/
     text-align: right;
     position: relative;
 }
@@ -18,10 +18,12 @@ body{
     border-radius: 90px;
     font-size: 14px;
 }
-div.search_bar{
+#search_form{
     position: relative;
-    top:100px;
-    left:600px;
+    left:20px;
+    text-align: center;
+   /* margin: 10px;
+    padding: 10px;*/
 }
 
 #input_box{
@@ -46,7 +48,7 @@ div.search_bar{
 h1{
     background: linear-gradient(to right, #11acbd , #fff);
     position: relative;
-    top: 200px;
+    top: 10px;
     left: 30px;
     margin: -5px 15px 20px 10px;
     padding: 3px 30px 3px 20px;
@@ -56,13 +58,23 @@ h1{
 h2, h3{
     background-color: white;
 }
-
-div.column{
+div.row{
     float: left;
-    width: 40%;
+    position: relative;
+}
+.column1{
+    float: left;
+   /* width: 40%;*/
     padding: 15px;   
     position: relative;
-    top:240px;
+   /* top:20px;*/
+    left:30px;
+}
+.column2{
+    float: left;
+    width: 90%;
+    padding: 15px;   
+    position: relative;
     left:30px;
 }
 
@@ -94,14 +106,26 @@ table{
 tr{
     height: 40px;
     background-color: #f1f1f1;
+    border: 1px solid black;
+    text-align: center;
 }
 
 th{
     background-color: white;
-    border: 1px solid black;
 }
 
 td{
     background-color: white;
-    border-right:1px solid black;
+    border:1px solid black;
+}
+
+a.result{
+    font-size: 18px;
+}
+a.result_url{
+    font-size: 14px;
+    color: green;
+}
+a.snippet{
+    font-size: 13px;
 }
