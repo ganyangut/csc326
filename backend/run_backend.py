@@ -12,7 +12,6 @@ def run_crawler(database_file, url_file, crawler_id, number_processes):
 number_processes = 3
 database_file_integrated = "persistent_storage.db"
 
-
 start = timer()
 
 dbfile_list = []
@@ -29,7 +28,6 @@ for crawler_id in range(number_processes):
     
 for p in process_list:   
     p.join()
-
 
 end1 = timer()
 start1 = end1
@@ -86,6 +84,7 @@ for database_file in dbfile_list:
     db_cursor.execute('SELECT * FROM page_rank')
     page_rank = db_cursor.fetchall()    
     integrated_db_cursor.executemany('INSERT INTO page_rank VALUES (?, ?, ?)', page_rank)
+    
     # clean up
     db_conn.close()
 
@@ -101,8 +100,6 @@ print (end - start1)
 print "time used: "
 print (end - start)
 
-
-
 db_conn = sqlite3.connect(database_file_integrated)
 db_cursor = db_conn.cursor()
 
@@ -116,11 +113,19 @@ db_cursor.execute("SELECT * FROM document_index")
 document_index = db_cursor.fetchall()
 
 db_conn.close()
-with open("test.out", 'w') as do:
-    do.write("page rank:\n")
-    for (crawler_id, document_id, rank_value) in page_rank_dict: 
-        do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + str(rank_value) + ')' + '\n')
+with open("test.out", 'w') as do:    
     
+    do.write("document index:")
+    for (crawler_id, document_id, url, title, short_description) in document_index: 
+        if title and short_description:
+            do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + url + ', ' + title + ', ' + short_description + ')' + '\n')
+        elif title:
+            do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + url + ', ' + title + ', ' + ')' + '\n')
+        elif short_description:
+            do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + url + ', ' + ', ' + short_description + ')' + '\n')
+        else:
+            do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + url + ', ' + ', '  + ')' + '\n')
+
     '''
     print "lexicon:"
     for (crawler_id, word_id, word) in lexicon: 
@@ -129,11 +134,14 @@ with open("test.out", 'w') as do:
     for entry in inverted_index: 
         do.write(repr(entry)+'\n')
     
-    
+    do.write("page rank:\n")
+    for (crawler_id, document_id, rank_value) in page_rank_dict: 
+        do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + str(rank_value) + ')' + '\n')
     
     do.write("links:\n")
     for link in links: 
         do.write(repr(link)+'\n')
+
     print "document index:"
     for (crawler_id, document_id, url, title, short_description) in document_index: 
         if title and short_description:

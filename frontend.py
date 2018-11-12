@@ -34,22 +34,19 @@ history = History()
 # lab3 witout log in
 #myDB = MyDatabase()
 
-
 @get('/')  # or @route('/')
 def home():
     print "------route---home------------------------------"
     return template('./templates/query_page.tpl', login=False, history=history)
 
 # show search results, word count, and search history
-
-
 @post('/')  # or @route('/', method='POST')
 def show_results():
-
     # keyword from http get
     global keywords
     global words_count
     keywords = request.forms.get('keywords')
+
     # split keyword string into words and count them
     # store words in a dict
     words_list = keywords.split()
@@ -60,7 +57,6 @@ def show_results():
     first_word = first_word.lower()
     print "first_word: "+repr(first_word)+"\n"
     redirect('/keyword/'+first_word+'/page_no/1')
-
 
 # pagination for urls found
 @route('/keyword/<keyword>/page_no/<page_no>')
@@ -111,25 +107,22 @@ def search_first_word(keyword,page_no):
                     login=False, history=history, first_word=first_word, document=document, cur_page_num=cur_page_num,
                     num_per_page=num_per_page, page_num_counts=page_num_counts)
 
-
 def pagination(url_counts):
     # q for quotient, r for remainder
     q, r = divmod(url_counts, num_per_page)
-
     if r != 0:
         page_num_counts = q+1
     else:
         page_num_counts = q
     return page_num_counts
 
-
 @error(404)
 def error404(error):
     return template('./templates/error_page.tpl',error=error)
 
-
 '''
-#LAB2 with google log in
+# LAB2 with google log in
+
 # ask for keywords from user
 @get('/')  # or @route('/')
 def home():

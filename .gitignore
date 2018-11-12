@@ -1,6 +1,6 @@
 backend/*.pyc
 backend/*.db
-backend/*.out
+#backend/*.out
 
 data
 

@@ -44,9 +44,12 @@ class MyDatabase:
                     print "page_rank ----- id: "+repr(id)
                     self._cursor.execute( "SELECT rank_value, crawler_id, document_id FROM page_rank where crawler_id= ? and document_id = ?", id)
                     temp_page_rank = self._cursor.fetchall()
-                    page_rank[temp_page_rank[0][1],temp_page_rank[0][2]]=(temp_page_rank[0][0])
-                    #page_rank[temp_page_rank[0][0]]=(temp_page_rank[0][1],temp_page_rank[0][2])
-                    #page_rank_list.append({temp_page_rank[0][0]:(temp_page_rank[0][1],temp_page_rank[0][2])})
+                    if temp_page_rank:
+                        page_rank[temp_page_rank[0][1],temp_page_rank[0][2]]=(temp_page_rank[0][0])
+                        #page_rank[temp_page_rank[0][0]]=(temp_page_rank[0][1],temp_page_rank[0][2])
+                        #page_rank_list.append({temp_page_rank[0][0]:(temp_page_rank[0][1],temp_page_rank[0][2])})
+                    else:
+                        page_rank[id] = 0
                     print "temp_page_rank: "+repr(temp_page_rank)
                     print "page_rank: "+repr(page_rank)
                 

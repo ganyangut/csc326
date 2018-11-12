@@ -292,8 +292,16 @@ class crawler(object):
         # add depth and title/alt/text to index for destination url
         if not skip:
             self.document_index[self.document_id(dest_url)].depth = self._curr_depth
+            
+            #title_text = attr(elem,"title")
+            # change unicode string to ascii string
+            #title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
+            #self.document_index[self.document_id(dest_url)].title = title_text
+            
+            
+            
             # get text
-            text = attr(elem,"title") + attr(elem,"alt") + self._text_of(elem)
+            text = attr(elem,"alt") + self._text_of(elem)
             # change unicode string to ascii string
             text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
             # break into lines and remove leading and trailing space on each
