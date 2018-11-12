@@ -9,4 +9,4 @@ class StaticVar():
         'session.data_dir': './data',
         'session.auto': True
     }
-    num_per_page = 2
+    num_per_page = 5

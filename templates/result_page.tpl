@@ -4,7 +4,7 @@
 
 <header>
     <meta http-equiv="Content-type" content="text/html"; charset="UTF-8">
-    <link rel="icon" href="./assets/image/icon.ico">
+    <link rel="icon" href="/assets/image/icon.ico">
     <title>{{keywords}} - Waldoge Search</title>
     <link rel="stylesheet" type="text/css" href="/assets/css/result_page.css">
      <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
@@ -109,6 +109,25 @@
         <!--/div-->
         %end
 
+        <div class="column2">
+        %if document:
+            % for entry in document:
+                <a href={{entry[0]}} target="_blank" class="result">{{entry[1]}}</a><br>
+                <a href={{entry[0]}} target="_blank" class="result_url">{{entry[0]}}</a>
+                <p class="snippet">{{entry[2]}}</p>
+            %end
+            %i=0
+            <ul class="pagination">
+            %while i < page_num_counts:
+                %i=i+1
+                <li><a href="/keyword/{{first_word}}/page_no/{{i}}">{{i}}</a> </li>
+            %end
+            </ul>
+        %else:
+            <p> No urls found</p>
+        %end
+        </div>
+        <!--
         <table id = "urls" class="column2">
                 %if document:
                     <tr>
@@ -150,6 +169,7 @@
                 %end
 
         </table>
+        -->
     </div>
 
 

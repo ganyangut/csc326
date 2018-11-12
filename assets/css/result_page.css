@@ -1,12 +1,12 @@
-body{
+/*body{
     background: url("../../assets/image/waldoge_1.jpg") no-repeat center center fixed;
     background-size: cover;
 }
-
+*/
 #login_form{
     top: 0px;
     right: 20px;
-    height: 80px;
+   /* height: 80px;*/
     text-align: right;
     position: relative;
 }
@@ -22,8 +22,8 @@ body{
     position: relative;
     left:20px;
     text-align: center;
-    margin: 10px;
-    padding: 10px;
+   /* margin: 10px;
+    padding: 10px;*/
 }
 
 #input_box{
@@ -64,10 +64,10 @@ div.row{
 }
 .column1{
     float: left;
-    width: 40%;
+   /* width: 40%;*/
     padding: 15px;   
     position: relative;
-    top:20px;
+   /* top:20px;*/
     left:30px;
 }
 .column2{
@@ -75,7 +75,6 @@ div.row{
     width: 90%;
     padding: 15px;   
     position: relative;
-    top:20px;
     left:30px;
 }
 
@@ -108,6 +107,7 @@ tr{
     height: 40px;
     background-color: #f1f1f1;
     border: 1px solid black;
+    text-align: center;
 }
 
 th{
@@ -119,3 +119,13 @@ td{
     border:1px solid black;
 }
 
+a.result{
+    font-size: 18px;
+}
+a.result_url{
+    font-size: 14px;
+    color: green;
+}
+a.snippet{
+    font-size: 13px;
+}

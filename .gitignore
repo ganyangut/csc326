@@ -5,3 +5,4 @@ backend/*.out
 data
 
 instance_deployment/copy_to_aws/lab1_code/backend/*.pyc
+/*.pyc

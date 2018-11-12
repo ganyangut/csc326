@@ -76,13 +76,15 @@ def search_first_word(keyword,page_no):
     document_id = myDB.select_document_id_from_InvertedIndex(word_id)
     print "document_id: "
     print document_id
-    # remove document_id that doesnot point to other docs
-    # which means remove doc_ids that cannot be found in table links's column from_doc_id
-    linked_document_id = myDB.select_doc_id_with_links_from_Link(document_id)
 
     # sort document id by their rank score
-    sorted_document_id = myDB.select_document_id_from_PageRank(
-        linked_document_id)
+    sorted_document_id = myDB.select_document_id_from_PageRank(document_id)
+    print "sorted_document_id: "
+    print sorted_document_id
+    f = open("sorted_document_id.txt","w+")
+    f.write(repr(sorted_document_id))
+    f.close()
+
     print "sorted_document_id length: "
     url_counts = len(sorted_document_id)
 
@@ -123,7 +125,7 @@ def pagination(url_counts):
 
 @error(404)
 def error404(error):
-    return 'Nothing here, sorry'
+    return template('./templates/error_page.tpl',error=error)
 
 
 '''
