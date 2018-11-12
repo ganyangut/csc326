@@ -36,8 +36,8 @@ def page_rank(links, num_iterations=20, initial_pr=1.0):
     
     # convert each set of incoming links into a numpy array
     for doc_id in incoming_link_sets:
-        print "------------- doc_id in incoming_link_sets ------"
-        print doc_id
+        #print "------------- doc_id in incoming_link_sets ------"
+        #print doc_id
         incoming_links[doc_id] = np.array([from_doc_id for from_doc_id in incoming_link_sets[doc_id]])
 
     num_documents = float(len(num_outgoing_links))
@@ -46,8 +46,8 @@ def page_rank(links, num_iterations=20, initial_pr=1.0):
 
     for _ in xrange(num_iterations):
         for doc_id in num_outgoing_links:
-            print "------------- doc_id in num_outgoing_links ------"
-            print doc_id
+            #print "------------- doc_id in num_outgoing_links ------"
+            #print doc_id
             tail = 0.0
             if len(incoming_links[doc_id]):
                 tail = damping_factor * partial_PR(incoming_links[doc_id]).sum()

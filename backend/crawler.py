@@ -240,7 +240,8 @@ class crawler(object):
         parsed_url = urlparse.urlparse(curr_url)
         fixed_url = urlparse.urljoin(parsed_url.geturl(), rel)
         try:
-            fixed_url = unicodedata.normalize('NFKD', fixed_url).encode('ascii','ignore')
+            if isinstance(fixed_url, unicode):
+                fixed_url = unicodedata.normalize('NFKD', fixed_url).encode('ascii','ignore')
         finally:
             return fixed_url
 
@@ -255,7 +256,8 @@ class crawler(object):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
         # change unicode string to ascii string
-        title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
+        if isinstance(title_text, unicode):
+            title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
 
         #print "crawler id="+ repr(self.crawler_id)
         #print "document title="+ repr(title_text)
@@ -293,17 +295,22 @@ class crawler(object):
         if not skip:
             self.document_index[self.document_id(dest_url)].depth = self._curr_depth
             
-            #title_text = attr(elem,"title")
+            title_text = attr(elem,"title")
             # change unicode string to ascii string
-            #title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
-            #self.document_index[self.document_id(dest_url)].title = title_text
+            if isinstance(title_text, unicode):
+                title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
+            #print "visit a title text:"
+            #print title_text
+            if not self.document_index[self.document_id(dest_url)].title:
+                self.document_index[self.document_id(dest_url)].title = title_text
             
             
             
             # get text
             text = attr(elem,"alt") + self._text_of(elem)
             # change unicode string to ascii string
-            text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
+            if isinstance(text, unicode):
+                text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
             # break into lines and remove leading and trailing space on each
             lines = (line.strip() for line in text.splitlines())
             # break multi-head lines
@@ -313,8 +320,10 @@ class crawler(object):
             line_counter = 0
             for chunk in chunks:
                 if line_counter >= 3:
-                    break
+                    break                    
                 if chunk:
+                    if '{' in chunk:
+                        continue
                     short_description.append(chunk)
                     line_counter += 1
             self.document_index[self.document_id(dest_url)].short_description = "\n".join(short_description)
@@ -349,7 +358,8 @@ class crawler(object):
             if word in self._ignored_words:
                 continue
             # change unicode string to ascii string
-            word = unicodedata.normalize('NFKD', word).encode('ascii','ignore')
+            if isinstance(word, unicode):
+                word = unicodedata.normalize('NFKD', word).encode('ascii','ignore')
             self._curr_words.append((self.word_id(word), self._font_size))
         
     def _text_of(self, elem):
@@ -446,7 +456,8 @@ class crawler(object):
                 
                 # get text
                 text = soup.getText(separator=u' ')
-                text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
+                if isinstance(text, unicode):
+                    text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
                 # break into lines and remove leading and trailing space on each
                 lines = (line.strip() for line in text.splitlines())
                 # break multi-head lines
