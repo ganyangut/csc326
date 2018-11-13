@@ -255,20 +255,19 @@ class crawler(object):
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
-        if title_text:        
-            # change unicode string to ascii string
-            if isinstance(title_text, unicode):
-                title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
+        # change unicode string to ascii string
+        if isinstance(title_text, unicode):
+            title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
 
-            #print "crawler id="+ repr(self.crawler_id)
-            #print "document title="+ repr(title_text)
+        #print "crawler id="+ repr(self.crawler_id)
+        #print "document title="+ repr(title_text)
 
-            # update document title for document id self._curr_doc_id
-            self.document_index[self._curr_doc_id].title = title_text
+        # update document title for document id self._curr_doc_id
+        self.document_index[self._curr_doc_id].title = title_text
 
-            # insert into database
-            self.db_cursor.execute('''UPDATE document_index SET title = ? WHERE crawler_id = ? AND document_id = ? ''', 
-                                    (title_text, self.crawler_id, self._curr_doc_id))
+        # insert into database
+        self.db_cursor.execute('''UPDATE document_index SET title = ? WHERE crawler_id = ? AND document_id = ? ''', 
+                                (title_text, self.crawler_id, self._curr_doc_id))
     
     def _visit_a(self, elem):
         """Called when visiting <a> tags."""
@@ -414,52 +413,6 @@ class crawler(object):
                 self._enter[tag_name](tag)
                 stack.append(tag)
 
-                # if no title tag, use h1 as title
-                if tag_name == "h1":
-
-                    if self._curr_url == "http://www.amazon.ca/gp/prime":
-                        print "url-h1-----"
-                    h1_text = self._text_of(tag).strip()
-
-                    if self._curr_url == "http://www.amazon.ca/gp/prime":
-                        print "url-h1 text-----"
-                        print h1_text
-                    if h1_text:                    
-                        if self._curr_url == "http://www.amazon.ca/gp/prime":
-                            print "h1"
-                            print h1_text
-
-                        # change unicode string to ascii string
-                        if isinstance(h1_text, unicode):
-                            h1_text = unicodedata.normalize('NFKD', h1_text).encode('ascii','ignore')
-                        if not self.document_index[self._curr_doc_id].title:                    
-                            # update document title for document id self._curr_doc_id
-                            self.document_index[self._curr_doc_id].title = h1_text
-                            # insert into database
-                            self.db_cursor.execute('''UPDATE document_index SET title = ? WHERE crawler_id = ? AND document_id = ? ''', 
-                                                    (h1_text, self.crawler_id, self._curr_doc_id))
-                        elif not self.document_index[self._curr_doc_id].short_description:
-                            if self._curr_url == "http://www.amazon.ca/gp/prime":
-                                print "short_description2"
-                                print h1_text
-                            self.document_index[self._curr_doc_id].short_description = h1_text
-                
-                # if no short_description, use h2 h3 h4 as short_description
-                if (tag_name == "h2" or tag_name == "h3" or tag_name == "h4") and not self.document_index[self._curr_doc_id].short_description:
-                    h234_text = self._text_of(tag).strip()
-                    if h234_text:
-                        # change unicode string to ascii string
-                        if isinstance(h234_text, unicode):
-                            h234_text = unicodedata.normalize('NFKD', h234_text).encode('ascii','ignore')
-                        self.document_index[self._curr_doc_id].short_description = h234_text
-
-                        if self._curr_url == "http://www.amazon.ca/gp/prime":
-                            print "h234 text"
-                            print h234_text
-                    
-
-
-
             # text (text, cdata, comments, etc.)
             else:
                 self._add_text(tag)
@@ -503,19 +456,15 @@ class crawler(object):
                 short_description = soup.find("meta", attrs= {'name': 'description'})
                 if short_description:
                     short_description = short_description["content"]
-                    if short_description:
-                        if isinstance(short_description, unicode):
-                            short_description = unicodedata.normalize('NFKD', short_description).encode('ascii','ignore')
-                        self.document_index[self._curr_doc_id].short_description = short_description
-                        
-                        if self._curr_url == "http://www.amazon.ca/gp/prime":
-                            print "short_description1"
-                        #print "short_description:"
-                        #print type(short_description)
-                        #print short_description
-                        # insert into database
-                        #self.db_cursor.execute('''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? ''', 
-                        #                        (short_description, self.crawler_id, self._curr_doc_id))            
+                    if isinstance(short_description, unicode):
+                        short_description = unicodedata.normalize('NFKD', short_description).encode('ascii','ignore')
+                    self.document_index[self._curr_doc_id].short_description = short_description
+                    print "short_description:"
+                    print type(short_description)
+                    print short_description
+                    # insert into database
+                    self.db_cursor.execute('''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? ''', 
+                                            (short_description, self.crawler_id, self._curr_doc_id))            
 
                 '''
                 # get text
@@ -555,12 +504,6 @@ class crawler(object):
                     socket.close()
   
         # insert into database
-        for document_id in self.document_index:          
-            self.db_cursor.execute('''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? ''', 
-                                    (self.document_index[document_id].short_description, self.crawler_id, document_id))       
-        
-        
-        
         for word_id in self.inverted_index: 
             for document_id in self.inverted_index[word_id]: 
                 self.db_cursor.execute("INSERT INTO inverted_index VALUES (?,?,?)", (self.crawler_id, word_id, document_id))

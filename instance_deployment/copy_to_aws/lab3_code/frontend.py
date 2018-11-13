@@ -31,6 +31,9 @@ num_per_page = StaticVar.num_per_page
 # lab3 only
 history = History()
 
+# lab3 witout log in
+#myDB = MyDatabase()
+
 @get('/')  # or @route('/')
 def home():
     print "------route---home------------------------------"
@@ -58,31 +61,30 @@ def show_results():
 # pagination for urls found
 @route('/keyword/<keyword>/page_no/<page_no>')
 def search_first_word(keyword,page_no):
-    first_word = keyword
-    
-    # connect to database
+    first_word=keyword
     db_conn = lite.connect(database_file)
+    #global myDB
     myDB = MyDatabase(db_conn)
-    
-    # get word ids and crawler ids from lexicon
+
     word_id = myDB.select_word_id_from_lexicon(first_word)
 
-    # get document ids and crawler ids from inverted index
     document_id = myDB.select_document_id_from_InvertedIndex(word_id)
 
-    # sort document ids and crawler ids by their rank score
+    # sort document id by their rank score
     sorted_document_id = myDB.select_document_id_from_PageRank(document_id)
-    
-    # get document ids and crawler ids based on page number
-    url_counts = len(sorted_document_id)    
+
+    url_counts = len(sorted_document_id)
+
     page_num_counts = pagination(url_counts)
     cur_page_num=int(page_no)
     if cur_page_num > 0:
         cur_page_num = cur_page_num -1
-    start_num = cur_page_num * num_per_page
-    end_num = start_num + num_per_page   
+    start_num = cur_page_num*num_per_page
+    end_num = start_num + num_per_page  
+
     document = myDB.select_document_from_DocumentIndex(sorted_document_id[start_num:end_num])
 
+    db_conn.commit()
     db_conn.close()
 
     return template('./templates/result_page.tpl', keywords=keywords, words_count=words_count,
@@ -270,4 +272,4 @@ def send_templates(filename):
 if __name__ == "__main__":
     app = SessionMiddleware(app(), sessions_opts)
     # run server
-    run(app=app, host='localhost', port=8081, debug=True)
+    run(app=app, host='0.0.0.0', port=80, debug=True)

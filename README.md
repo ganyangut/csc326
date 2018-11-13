@@ -2,6 +2,41 @@
 
 a search engine project
 
+## Lab 3
+
+### Bonus
+
+We implemented the multiprocess crawler and page ranker. You can set number_processes in lab3_group_20/backend/run_backend_test.py
+We tested it with these three urls in lab3_group_20/backend/urls.txt:
+    http://www.eecg.toronto.edu/
+    https://www.utoronto.ca/
+    http://www.amazon.ca/
+It would take 112 seconds to finish the crawl and rank process in single process (almost equal to the sum of time used by each url). 
+If we use three proceses, the time reduced to 62 seconds (almost the same as the time for the most time-consuming url https://www.utoronto.ca/)
+The detailed results is in lab3_group_20/backend/multi_processing_time_improvement.txt
+
+### Backend
+
+* How to run backend:
+  * ~/lab3_group_20$ cd backend
+  * ~/lab3_group_20/backend$ python run_backend_test.py
+
+### AWS related
+
+* How to access the web page currently running on our aws instance
+  * in a web browser, enter:
+    * http://54.88.204.39/
+
+### Benchmark
+
+* Frontend benchmark setup
+  * send concurrent identical requests with keywords “helloworld foo bar” to our web page with a total of 1000 requests
+  * ~/lab3_group_20$ ab -n 1000 -c 50 http://54.88.204.39/?keywords=helloworld+foo+bar
+
+* Test results
+  * Compared to Lab2, the response time reduced, because we removed the background picture in our result page.
+  * The CPU usage increased dramatically, since the frontend is reading the database.
+
 ## Lab 2
 
 ### Local version (with Google Login)
@@ -42,7 +77,7 @@ a search engine project
 
 * How to deploy a instance and run our search engine on aws:
   * source the shell script
-    * ~/lab2_group_20$ source run_page_on_aws.sh
+    * ~/lab2_group_20$ source lab2_run_page_on_aws.sh
     * <public_ip_address> should be printed out on the terminal
     * <public_ip_address> is also avaliable in lab2_group_20/instance_deployment/public_ip.txt
   * close the treminal

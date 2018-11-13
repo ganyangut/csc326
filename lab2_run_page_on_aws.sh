@@ -2,6 +2,8 @@
 
 cd instance_deployment
 
+chmod 700 waldoge_key_pair.pem
+
 python deploy_instance.py
 
 # check running instance and write public ip to public_ip.txt

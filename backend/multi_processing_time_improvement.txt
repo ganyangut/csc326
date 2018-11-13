@@ -3,47 +3,27 @@ https://www.utoronto.ca/
 http://www.amazon.ca/
 
 number_processes = 3:
-    time used 1:
-    16.706414938
-    time used 2:
-    0.0801029205322
     time used:
-    16.7865178585
-    
-    time used 1:
-    14.497387886
-    time used 2:
-    0.0768830776215
-    time used:
-    14.5742709637
+    62.370454073
     
 number_processes = 1:
-    time used 1:
-    37.4238679409
-    time used 2:
-    0.112762928009
     time used:
-    37.5366308689
-
-old_version:
-    time used:
-    33.1569330692
-
+    112.643885851
 
 http://www.amazon.ca/
 
 number_processes = 1:
     time used:
-    15.1237630844
+    39.0194427967
 
 https://www.utoronto.ca/
 
 number_processes = 1:
     time used:
-    12.3834290504
+    61.8348019123
 
 http://www.eecg.toronto.edu/
 
 number_processes = 1:
     time used:
-    9.72040319443
+    7.11421012878
