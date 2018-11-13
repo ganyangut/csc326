@@ -2,6 +2,9 @@
 
 a search engine project
 
+note: all shell scripts are written in bash syntax
+If you are in a csh, please run bash first.
+
 ## Lab 3
 
 ### Bonus
@@ -15,6 +18,15 @@ It would take 112 seconds to finish the crawl and rank process in single process
 If we use three proceses, the time reduced to 62 seconds (almost the same as the time for the most time-consuming url https://www.utoronto.ca/)
 The detailed results is in lab3_group_20/backend/multi_processing_time_improvement.txt
 
+### Frontend
+
+* How to run our search engine:
+  * ~/lab3_group_20$ python frontend.py
+
+* How to test the web page
+  * in a web browser, enter:
+    * localhost:8081
+
 ### Backend
 
 * How to run backend:
@@ -25,17 +37,37 @@ The detailed results is in lab3_group_20/backend/multi_processing_time_improveme
 
 * How to access the web page currently running on our aws instance
   * in a web browser, enter:
-    * http://54.88.204.39/
+    * http://52.87.155.235/
 
 ### Benchmark
 
 * Frontend benchmark setup
-  * send concurrent identical requests with keywords “helloworld foo bar” to our web page with a total of 1000 requests
-  * ~/lab3_group_20$ ab -n 1000 -c 50 http://54.88.204.39/?keywords=helloworld+foo+bar
+  * send concurrent identical requests with keywords “helloworld foo bar” to our web page with different concurrency level in 2 seconds
+  * ~/lab3_group_20$ ab -c 10 -t 2 http://52.87.155.235/?keywords=helloworld+foo+bar
+  * ~/lab3_group_20$ ab -c 50 -t 2 http://52.87.155.235/?keywords=helloworld+foo+bar
+  * ~/lab3_group_20$ ab -c 200 -t 2 http://52.87.155.235/?keywords=helloworld+foo+bar
+  * ~/lab3_group_20$ ab -c 500 -t 2 http://52.87.155.235/?keywords=helloworld+foo+bar
 
 * Test results
-  * Compared to Lab2, the response time reduced, because we removed the background picture in our result page.
-  * The CPU usage increased dramatically, since the frontend is reading the database.
+
+  Maximum number of connections that can be handled by the server before any connection drops
+      500 (tested, may be more)
+
+  Maximum number of requests per second (RPS) that can be sustained by the server when operating with maximum number of connections
+      125.24 [#/sec]
+
+  Average and 99 percentile of response time or latency per request 
+      50%    261 ms
+      99%   1262 ms
+
+  Utilization of CPU, memory, disk IO, and network when max performance is sustained
+      Max CPU usage           21%
+      Max memory usage        less than 32.0M
+      Max disk I/O            387k/40k
+      Max network read/write  66k/329k
+
+  * Compared to Lab2, the response time, CPU usage, and disk I/O increased.
+    The reason is that the frontend is reading the database on disk, and this process consumes CPU and costs time.
 
 ## Lab 2
 

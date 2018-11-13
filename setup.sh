@@ -27,6 +27,8 @@ pip install --upgrade requests
 pip install --upgrade boto
 # install awscli:
 pip install --upgrade awscli
+# install numpy:
+pip install --upgrade numpy
 
 # install the Apache benchmarking tool
 sudo apt-get install -y apache2-utils

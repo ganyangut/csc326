@@ -1,0 +1,14 @@
+Public IP: 52.87.155.235
+--total-cpu-usage-- -dsk/total- -net/total- ------memory-usage----- -most-expensive- --most-expensive-
+usr sys idl wai stl| read  writ| recv  send| used  free  buff  cach|  cpu process   |  memory process
+  2   1  96   0   1| 387k   40k|   0     0 | 118M  584M 28.9M  225M|python       1.1|python      31.0M
+  0   0 100   0   0|   0     0 | 140B  664B| 118M  584M 28.9M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |  52B  320B| 118M  584M 28.9M  225M|                |python      31.0M
+  9   2  89   0   0|   0     0 |  28k  143k| 118M  584M 28.9M  225M|python       8.0|python      31.0M
+ 19   3  78   0   0|   0     0 |  66k  329k| 119M  583M 28.9M  225M|python        21|python      31.0M
+ 11   0  89   0   0|   0     0 |  35k  163k| 118M  583M 28.9M  225M|python       9.0|python      31.0M
+  1   0  99   0   0|   0     0 | 908B 1252B| 118M  584M 28.9M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |  52B  262B| 118M  584M 28.9M  225M|                |python      31.0M
+  1   0  99   0   0|   0     0 |   0   738B| 118M  584M 28.9M  225M|                |python      31.0M
+  0   1  99   0   0|   0     0 | 296B  500B| 118M  584M 28.9M  225M|                |python      31.0M
+  0   1  99   0   0|   0     0 |  52B  262B| 118M  584M 28.9M  225M|                |python      31.0M

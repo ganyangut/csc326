@@ -1,0 +1,40 @@
+Public IP: 52.87.155.235
+--total-cpu-usage-- -dsk/total- -net/total- ------memory-usage----- -most-expensive- --most-expensive-
+usr sys idl wai stl| read  writ| recv  send| used  free  buff  cach|  cpu process   |  memory process
+  0   0 100   0   0|   0     0 | 767B  828B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |  52B  246B| 122M  581M 28.7M  225M|                |python      31.0M
+  1   0  99   0   0|   0     0 | 213B  246B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   1  99   0   0|   0     0 |5075B 3362B| 122M  581M 28.7M  225M|                |python      31.0M
+  1   0  99   0   0|   0     0 | 884B 1384B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0    80k|  52B  262B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   1  99   0   0|   0    24k|  52B  254B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |  52B  468B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |  52B  246B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |  52B  246B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   1  99   0   0|   0     0 |  52B  246B| 122M  581M 28.7M  225M|                |python      31.0M
+  1   0  99   0   0|   0     0 |  52B  262B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |  52B  460B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |  52B  246B| 122M  581M 28.7M  225M|                |python      31.0M
+  1   0  99   0   0|   0     0 |  94B  288B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 | 652B 1002B| 122M  581M 28.7M  225M|                |python      31.0M
+ 12   2  86   0   0|   0     0 |  35k  192k| 122M  581M 28.7M  225M|python        13|python      31.0M
+  9   1  90   0   0|   0     0 |  27k  145k| 122M  581M 28.7M  225M|python       9.0|python      31.0M
+ 12   0  87   0   1|   0     0 |  38k  202k| 122M  581M 28.7M  225M|python        14|python      31.0M
+  8   1  91   0   0|   0     0 |  24k  128k| 122M  581M 28.7M  225M|python       8.0|python      31.0M
+ 13   0  87   0   0|   0     0 |  38k  199k| 122M  581M 28.7M  225M|python        13|python      31.0M
+  9   1  89   0   1|   0     0 |  28k  148k| 122M  581M 28.7M  225M|python        10|python      31.0M
+ 14   0  86   0   0|   0     0 |  34k  178k| 122M  581M 28.7M  225M|python        11|python      31.0M
+ 10   2  88   0   0|   0     0 |  29k  152k| 122M  581M 28.7M  225M|python        11|python      31.0M
+ 10   1  89   0   0|   0     0 |  34k  179k| 122M  581M 28.7M  225M|python        11|python      31.0M
+  9   0  90   0   1|   0     0 |  30k  160k| 122M  581M 28.7M  225M|python        12|python      31.0M
+ 13   1  86   0   0|   0     0 |  35k  184k| 122M  581M 28.7M  225M|python        12|python      31.0M
+ 10   1  89   0   0|   0     0 |  27k  142k| 122M  581M 28.7M  225M|python       9.0|python      31.0M
+  1   0  99   0   0|   0     0 |3604B   18k| 122M  581M 28.7M  225M|python       1.0|python      31.0M
+  0   1  99   0   0|   0     0 |   0   810B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 | 296B  656B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |   0   492B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   1  99   0   0|   0     0 | 168B  246B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |   0   524B| 122M  581M 28.7M  225M|                |python      31.0M
+  1   0  99   0   0|   0     0 | 168B  246B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |  52B  328B| 122M  581M 28.7M  225M|                |python      31.0M
+  0   0 100   0   0|   0     0 |  52B  246B| 122M  581M 28.7M  225M|                |python      31.0M
