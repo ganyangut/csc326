@@ -66,6 +66,8 @@ The detailed results is in lab3_group_20/backend/multi_processing_time_improveme
       Max disk I/O            387k/40k
       Max network read/write  66k/329k
 
+  Raw data locates in lab3_group_20/test_results/
+
   * Compared to Lab2, the response time, CPU usage, and disk I/O increased.
     The reason is that the frontend is reading the database on disk, and this process consumes CPU and costs time.
 
