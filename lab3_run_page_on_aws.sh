@@ -18,7 +18,7 @@ do
     scp -i waldoge_key_pair.pem copy_to_aws/setup_lab3.sh ubuntu@${public_ip}:~/
 
     # setup environment and run the page on aws
-    ssh -i waldoge_key_pair.pem ubuntu@${public_ip} 'source setup_lab3.sh'
+    ssh -i waldoge_key_pair.pem ubuntu@${public_ip} "screen && source setup_lab3.sh"
 done < "public_ip.txt"
 
 cd ..
