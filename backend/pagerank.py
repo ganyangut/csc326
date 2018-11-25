@@ -42,6 +42,7 @@ def page_rank(links, num_iterations=20, initial_pr=1.0):
 
     num_documents = float(len(num_outgoing_links))
     lead = (1.0 - damping_factor) / num_documents
+    #lead = (1.0 - damping_factor)
     partial_PR = np.vectorize(lambda doc_id: page_rank[doc_id] / num_outgoing_links[doc_id])
 
     for _ in xrange(num_iterations):

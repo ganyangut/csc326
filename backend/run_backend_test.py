@@ -48,6 +48,7 @@ integrated_db_cursor.executescript("""
             crawler_id INTEGER,
             word_id INTEGER,
             document_id INTEGER,
+            rank_value REAL,
             UNIQUE (crawler_id, word_id, document_id)
         );
         CREATE TABLE IF NOT EXISTS document_index(
@@ -76,7 +77,7 @@ for database_file in dbfile_list:
     
     db_cursor.execute('SELECT * FROM inverted_index')
     inverted_index = db_cursor.fetchall()    
-    integrated_db_cursor.executemany('INSERT INTO inverted_index VALUES (?, ?, ?)', inverted_index)
+    integrated_db_cursor.executemany('INSERT INTO inverted_index VALUES (?, ?, ?, ?)', inverted_index)
     
     db_cursor.execute('SELECT * FROM document_index')
     document_index = db_cursor.fetchall()    
@@ -120,9 +121,9 @@ document_index = db_cursor.fetchall()
 db_conn.close()
 
 # pretty print the page rank
-page_rank_dict.insert(0, ["crawler_id", "document_id", "rank_value"])
-pp = pprint.PrettyPrinter(indent=4)
-pp.pprint(page_rank_dict)
+#page_rank_dict.insert(0, ["crawler_id", "document_id", "rank_value"])
+#pp = pprint.PrettyPrinter(indent=4)
+#pp.pprint(page_rank_dict)
 
 
 
@@ -132,10 +133,10 @@ pp.pprint(page_rank_dict)
 
 
 
-'''
+
 with open("test.out", 'w') as do:    
     
-    do.write("document index:")
+    do.write("document index:\n")
     for (crawler_id, document_id, url, title, short_description) in document_index: 
         if title and short_description:
             do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + url + ', ' + title + ', ' + short_description + ')' + '\n')
@@ -145,19 +146,19 @@ with open("test.out", 'w') as do:
             do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + url + ', ' + ', ' + short_description + ')' + '\n')
         else:
             do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + url + ', ' + ', '  + ')' + '\n')
-'''
-'''
-    print "lexicon:"
+
+    do.write("\nlexicon:\n") 
     for (crawler_id, word_id, word) in lexicon: 
         do.write('(' + str(crawler_id) + ', ' + str(word_id) + ', ' + word + ')' + '\n')
-    print "inverted index:"
+    
+    do.write("\ninverted index:\n")
     for entry in inverted_index: 
         do.write(repr(entry)+'\n')
     
-    do.write("page rank:\n")
+    do.write("\npage rank:\n")
     for (crawler_id, document_id, rank_value) in page_rank_dict: 
         do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + str(rank_value) + ')' + '\n')
-    
+    '''
     do.write("links:\n")
     for link in links: 
         do.write(repr(link)+'\n')
@@ -173,4 +174,4 @@ with open("test.out", 'w') as do:
         else:
             do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + url + ', ' + ', '  + ')' + '\n')
 
-'''
+    '''

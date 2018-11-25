@@ -48,10 +48,12 @@ def show_results():
     # store words in a dict
     words_list = keywords.split()
     words_count = {word: words_list.count(word) for word in words_list}
-
-    first_word = words_list[0]
-    # lowercase first keyword
-    first_word = first_word.lower()
+    if words_list:
+        first_word = words_list[0]
+        # lowercase first keyword
+        first_word = first_word.lower()
+    else:
+        first_word = ""
     print "first_word: "+repr(first_word)+"\n"
     redirect('/keyword/'+first_word+'/page_no/1')
 
@@ -68,10 +70,10 @@ def search_first_word(keyword,page_no):
     word_id = myDB.select_word_id_from_lexicon(first_word)
 
     # get document ids and crawler ids from inverted index
-    document_id = myDB.select_document_id_from_InvertedIndex(word_id)
+    sorted_document_id = myDB.select_document_id_from_InvertedIndex(word_id)
 
     # sort document ids and crawler ids by their rank score
-    sorted_document_id = myDB.select_document_id_from_PageRank(document_id)
+    #sorted_document_id = myDB.select_document_id_from_PageRank(document_id)
     
     # get document ids and crawler ids based on page number
     url_counts = len(sorted_document_id)    

@@ -65,6 +65,7 @@ class crawler(object):
                     crawler_id INTEGER,
                     word_id INTEGER,
                     document_id INTEGER,
+                    rank_value REAL,
                     UNIQUE (crawler_id, word_id, document_id)
                 );
                 CREATE TABLE IF NOT EXISTS document_index(
@@ -103,7 +104,7 @@ class crawler(object):
         # the font size
         def visit_title(*args, **kargs):
             self._visit_title(*args, **kargs)
-            self._increase_font_factor(7)(*args, **kargs)
+            self._increase_font_factor(10)(*args, **kargs)
 
         # increase the font size when we enter these tags
         self._enter['b'] = self._increase_font_factor(2)
@@ -136,9 +137,15 @@ class crawler(object):
             'textarea', 'style', 'area', 'map', 'base', 'basefont', 'param',
         ])
 
+        #self._ignored_tags = set([
+        #    'embed', 'iframe', 'frame', 
+        #    'object', 'svg', 'canvas', 'applet', 'frameset', 
+        #    'textarea', 'style', 'area', 'map', 'base', 'basefont', 'param',
+        #])
+
         # set of words to ignore
         self._ignored_words = set([
-            '', 'the', 'of', 'at', 'on', 'in', 'is', 'it',
+            '', 'the', 'of', 'at', 'oamazon', 'in', 'is', 'it',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
             'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
             'u', 'v', 'w', 'x', 'y', 'z', 'and', 'or',
@@ -152,7 +159,7 @@ class crawler(object):
         self._curr_depth = 0
         self._curr_url = ""
         self._curr_doc_id = 0
-        self._font_size = 0
+        self._font_size = 1
         self._curr_words = None
 
         # get all urls into the queue
@@ -205,7 +212,7 @@ class crawler(object):
             self._word_id_cache[word] = word_id
         
         # add the word to inverted index and resolved inverted index
-        self.inverted_index.add(word_id, self._curr_doc_id)
+        self.inverted_index.add(word_id, self._curr_doc_id, self._font_size)
         self.resolved_inverted_index.add(word, self._curr_url)   
         
         return word_id
@@ -342,6 +349,10 @@ class crawler(object):
     def _increase_font_factor(self, factor):
         """Increade/decrease the current font size."""
         def increase_it(elem):
+            #if factor < 0:
+            #    self._font_size = 1
+            #else:
+            #    self._font_size = factor
             self._font_size += factor
         return increase_it
     
@@ -408,7 +419,7 @@ class crawler(object):
                         stack.pop()
                         tag = NextTag(tag.parent.nextSibling)
                     
-                    continue
+                    continue                
                 
                 # enter the tag
                 self._enter[tag_name](tag)
@@ -433,7 +444,7 @@ class crawler(object):
                         if isinstance(h1_text, unicode):
                             h1_text = unicodedata.normalize('NFKD', h1_text).encode('ascii','ignore')
                         if not self.document_index[self._curr_doc_id].title:                    
-                            # update document title for document id self._curr_doc_id
+                            # update document title for document id self._curr_doc_id_font_size
                             self.document_index[self._curr_doc_id].title = h1_text
                             # insert into database
                             self.db_cursor.execute('''UPDATE document_index SET title = ? WHERE crawler_id = ? AND document_id = ? ''', 
@@ -456,13 +467,13 @@ class crawler(object):
                         if self._curr_url == "http://www.amazon.ca/gp/prime":
                             print "h234 text"
                             print h234_text
-                    
-
-
-
+            
             # text (text, cdata, comments, etc.)
-            else:
+            #else:
+            try:
                 self._add_text(tag)
+            except:
+                pass
 
     def crawl(self, depth=2, timeout=3):
         """Crawl the web!"""
@@ -495,7 +506,7 @@ class crawler(object):
                 self._curr_depth = depth_ + 1
                 self._curr_url = url
                 self._curr_doc_id = doc_id
-                self._font_size = 0
+                self._font_size = 1
                 self._curr_words = [ ]
                 self._index_document(soup)
                 self._add_words_to_document()
@@ -558,18 +569,20 @@ class crawler(object):
         for document_id in self.document_index:          
             self.db_cursor.execute('''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? ''', 
                                     (self.document_index[document_id].short_description, self.crawler_id, document_id))       
-        
-        
-        
-        for word_id in self.inverted_index: 
-            for document_id in self.inverted_index[word_id]: 
-                self.db_cursor.execute("INSERT INTO inverted_index VALUES (?,?,?)", (self.crawler_id, word_id, document_id))
 
         page_rank_dict = page_rank(self.links)
-        page_rank_dict = sorted(page_rank_dict.items(), key = lambda x: -x[1])
-        for (document_id, rank_value) in page_rank_dict:
+        sorted_page_rank_dict = sorted(page_rank_dict.items(), key = lambda x: -x[1])
+        for (document_id, rank_value) in sorted_page_rank_dict:
             self.db_cursor.execute('''INSERT INTO page_rank VALUES (?,?,?)''', (self.crawler_id, document_id, rank_value))
         
+        for word_id in self.inverted_index:             
+            for document_id in self.inverted_index[word_id]: 
+                if document_id in page_rank_dict and self.inverted_index[word_id][document_id]:
+                    self.inverted_index[word_id][document_id] *= 1 #(1 + page_rank_dict[document_id] * 2)
+            self.inverted_index[word_id] = sorted(self.inverted_index[word_id].items(), key = lambda x: -x[1])
+            for (document_id, rank_value) in self.inverted_index[word_id]:
+                self.db_cursor.execute("INSERT INTO inverted_index VALUES (?,?,?,?)", (self.crawler_id, word_id, document_id, rank_value))
+
         # commit changes
         self.db_conn.commit()
         self.db_conn.close()

@@ -147,20 +147,24 @@ class InvertedIndex(dict):
     def __setitem__(self, key, val):
         if not isinstance(key, int):
             raise ValueError("inverted_index key must be an int")
-        if not isinstance(val, set):
-            raise ValueError("inverted_index value must be a set")
+        #if not isinstance(val, dict):
+        #    raise ValueError("inverted_index value must be a dict")
         return dict.__setitem__(self, key, val)
 
-    def add(self, word_id, document_id):
+    def add(self, word_id, document_id, font_size):
         if not isinstance(word_id, int):
             raise ValueError("word_id must be an int")
         if not isinstance(document_id, int):
             raise ValueError("document_id must be an int")
 
         if word_id in self:
-            self[word_id].add(document_id)
+            if document_id in self[word_id]:
+                self[word_id][document_id] += font_size
+            else:
+                self[word_id][document_id] = font_size
         else:
-            self[word_id] = set([document_id])
+            self[word_id] = { }
+            self[word_id][document_id] = font_size
 
 # key is word string
 # value is as set of document urls

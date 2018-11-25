@@ -22,11 +22,18 @@ class MyDatabase:
     def select_document_id_from_InvertedIndex(self, word_id):
         if self._cursor:
             try:
-                document_id = []
+                cid_docid_rankv = []
                 for id in word_id:
-                    self._cursor.execute("SELECT crawler_id, document_id FROM inverted_index where crawler_id = ? and word_id = ?", id)
-                    document_id = document_id + self._cursor.fetchall()
-                return document_id
+                    self._cursor.execute("SELECT crawler_id, document_id, rank_value FROM inverted_index where crawler_id = ? and word_id = ?", id)
+                    cid_docid_rankv = cid_docid_rankv + self._cursor.fetchall()
+                
+                sorted_cid_docid_rankv = sorted(cid_docid_rankv, key=lambda d: -d[2])
+                
+                sorted_cid_docid = []
+                for (crawler_id, document_id, rank_value) in sorted_cid_docid_rankv:
+                    sorted_cid_docid.append((crawler_id, document_id))
+
+                return sorted_cid_docid
             except lite.Error as e:
                 raise e
 
