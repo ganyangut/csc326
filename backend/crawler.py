@@ -128,7 +128,7 @@ class crawler(object):
         self._exit['h3'] = self._increase_font_factor(-5)
         self._exit['h4'] = self._increase_font_factor(-4)
         self._exit['h5'] = self._increase_font_factor(-3)
-        self._exit['title'] = self._increase_font_factor(-7)
+        self._exit['title'] = self._increase_font_factor(-10)
 
         # never go in and parse these tags
         self._ignored_tags = set([
@@ -209,9 +209,14 @@ class crawler(object):
             # 2) query the lexicon for the id assigned to this word, 
             #    store it in the word id cache, and return the id.
             word_id = self._insert_word(word)
-            self._word_id_cache[word] = word_id
+            self._word_id_cache[word] = word_id            
         
         # add the word to inverted index and resolved inverted index
+        if self._curr_url == "http://www.eecg.toronto.edu/~enright" and word == "amazon":
+            print "!!!!!!!!!!!!!!!!!!!!!!!!"
+            print self._font_size
+            print "!!!!!!!!!!!!!!!!!!!!!!!!"
+
         self.inverted_index.add(word_id, self._curr_doc_id, self._font_size)
         self.resolved_inverted_index.add(word, self._curr_url)   
         
@@ -354,6 +359,18 @@ class crawler(object):
             #else:
             #    self._font_size = factor
             self._font_size += factor
+            
+            if self._curr_url == "http://www.eecg.toronto.edu/~enright":
+                print
+                print "--------------------------------------------"
+                print elem.name.lower()
+                print factor
+                print self._font_size
+                print "--------------------------------------------"
+                print
+
+
+
         return increase_it
     
     def _visit_ignore(self, elem):
@@ -406,6 +423,12 @@ class crawler(object):
 
                 if tag.parent != stack[-1]:
                     self._exit[stack[-1].name.lower()](stack[-1])
+                    if self._curr_url == "http://www.eecg.toronto.edu/~enright":
+                        print "!!!!!!!!!!!!!!!!!!!!!!!!"
+                        print "exit"
+                        print tag.name.lower()
+                        print self._font_size                        
+                        print "!!!!!!!!!!!!!!!!!!!!!!!!"
                     stack.pop()
 
                 tag_name = tag.name.lower()
@@ -416,6 +439,12 @@ class crawler(object):
                         tag = NextTag(tag.nextSibling)
                     else:
                         self._exit[stack[-1].name.lower()](stack[-1])
+                        if self._curr_url == "http://www.eecg.toronto.edu/~enright":
+                            print "!!!!!!!!!!!!!!!!!!!!!!!!"
+                            print "exit"
+                            print tag_name
+                            print self._font_size                        
+                            print "!!!!!!!!!!!!!!!!!!!!!!!!"
                         stack.pop()
                         tag = NextTag(tag.parent.nextSibling)
                     
@@ -424,6 +453,13 @@ class crawler(object):
                 # enter the tag
                 self._enter[tag_name](tag)
                 stack.append(tag)
+
+                if self._curr_url == "http://www.eecg.toronto.edu/~enright":
+                    print "!!!!!!!!!!!!!!!!!!!!!!!!"
+                    print "enter"
+                    print tag_name
+                    print self._font_size                        
+                    print "!!!!!!!!!!!!!!!!!!!!!!!!"
 
                 # if no title tag, use h1 as title
                 if tag_name == "h1":
@@ -450,7 +486,7 @@ class crawler(object):
                             self.db_cursor.execute('''UPDATE document_index SET title = ? WHERE crawler_id = ? AND document_id = ? ''', 
                                                     (h1_text, self.crawler_id, self._curr_doc_id))
                         elif not self.document_index[self._curr_doc_id].short_description:
-                            if self._curr_url == "http://www.amazon.ca/gp/prime":
+                            if self._curr_url == "http://www.eecg.toronto.edu/~enright/":
                                 print "short_description2"
                                 print h1_text
                             self.document_index[self._curr_doc_id].short_description = h1_text
