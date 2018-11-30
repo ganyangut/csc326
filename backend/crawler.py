@@ -359,7 +359,7 @@ class crawler(object):
             #else:
             #    self._font_size = factor
             self._font_size += factor
-            
+            '''
             if self._curr_url == "http://www.eecg.toronto.edu/~enright":
                 print
                 print "--------------------------------------------"
@@ -368,6 +368,7 @@ class crawler(object):
                 print self._font_size
                 print "--------------------------------------------"
                 print
+            '''
 
 
 
@@ -614,7 +615,7 @@ class crawler(object):
         for word_id in self.inverted_index:             
             for document_id in self.inverted_index[word_id]: 
                 if document_id in page_rank_dict and self.inverted_index[word_id][document_id]:
-                    self.inverted_index[word_id][document_id] *= 1 #(1 + page_rank_dict[document_id] * 2)
+                    self.inverted_index[word_id][document_id] = self.inverted_index[word_id][document_id] * 0.0001 + page_rank_dict[document_id] * 100
             self.inverted_index[word_id] = sorted(self.inverted_index[word_id].items(), key = lambda x: -x[1])
             for (document_id, rank_value) in self.inverted_index[word_id]:
                 self.db_cursor.execute("INSERT INTO inverted_index VALUES (?,?,?,?)", (self.crawler_id, word_id, document_id, rank_value))
