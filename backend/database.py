@@ -3,17 +3,35 @@
 
 import sqlite3 as lite
 from static_variables import StaticVar
+import unicodedata
 
 class MyDatabase:
-
     def __init__(self,db_conn):
         self._db_conn = db_conn
         self._cursor = db_conn.cursor()
 
+    def get_all_words_from_lexicon(self):
+        if self._cursor:
+            try:
+                self._cursor.execute("SELECT DISTINCT word_string FROM lexicon")
+                words_from_db = self._cursor.fetchall()
+                word_list = []
+                count = 0
+                for (word_string, ) in words_from_db:
+                    if isinstance(word_string, unicode):
+                        word_string = unicodedata.normalize('NFKD', word_string).encode('ascii','ignore')
+                    word_list.append(word_string)
+                    count += 1
+                    if count == 10:
+                        break
+                return word_list
+            except lite.Error as e:
+                raise e
+
     def select_word_id_from_lexicon(self, word_string):
         if self._cursor:
             try:
-                self._cursor.execute( "SELECT crawler_id, word_id FROM lexicon where word_string = ?", (word_string,))
+                self._cursor.execute("SELECT crawler_id, word_id FROM lexicon where word_string = ?", (word_string,))
                 word_id = self._cursor.fetchall()
                 return word_id
             except lite.Error as e:
@@ -43,7 +61,7 @@ class MyDatabase:
                 page_rank={}
                 sorted_document_id = ()
                 for id in document_id:
-                    self._cursor.execute( "SELECT rank_value, crawler_id, document_id FROM page_rank where crawler_id= ? and document_id = ?", id)
+                    self._cursor.execute("SELECT rank_value, crawler_id, document_id FROM page_rank where crawler_id= ? and document_id = ?", id)
                     temp_page_rank = self._cursor.fetchall()
                     if temp_page_rank:
                         page_rank[temp_page_rank[0][1],temp_page_rank[0][2]]=(temp_page_rank[0][0])

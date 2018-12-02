@@ -5,6 +5,7 @@ import os
 import difflib
 import multiprocessing
 import pprint
+import json
 
 def run_crawler(database_file, url_file, crawler_id, number_processes):
     bot = crawler(database_file, url_file, crawler_id, number_processes)
@@ -57,14 +58,15 @@ integrated_db_cursor.executescript("""
             url TEXT, 
             title TEXT, 
             short_description TEXT
-        );     
-        CREATE TABLE IF NOT EXISTS page_rank(
-            crawler_id INTEGER,
-            document_id INTEGER,
-            rank_value REAL
-        );    
+        );
         """)
-
+'''
+CREATE TABLE IF NOT EXISTS page_rank(
+    crawler_id INTEGER,
+    document_id INTEGER,
+    rank_value REAL
+);  
+'''
 integrated_db_conn.commit()
 
 for database_file in dbfile_list:   
@@ -83,9 +85,9 @@ for database_file in dbfile_list:
     document_index = db_cursor.fetchall()    
     integrated_db_cursor.executemany('INSERT INTO document_index VALUES (?, ?, ?, ?, ?)', document_index)
     
-    db_cursor.execute('SELECT * FROM page_rank')
-    page_rank = db_cursor.fetchall()    
-    integrated_db_cursor.executemany('INSERT INTO page_rank VALUES (?, ?, ?)', page_rank)
+    #db_cursor.execute('SELECT * FROM page_rank')
+    #page_rank = db_cursor.fetchall()    
+    #integrated_db_cursor.executemany('INSERT INTO page_rank VALUES (?, ?, ?)', page_rank)
     
     # clean up
     db_conn.close()
@@ -93,6 +95,36 @@ for database_file in dbfile_list:
         os.remove(database_file)    
 
 integrated_db_conn.commit()
+
+integrated_db_cursor.execute("SELECT DISTINCT word_string FROM lexicon")
+words_from_db = integrated_db_cursor.fetchall()
+word_list = []
+#count = 0
+for (word_string, ) in words_from_db:
+    if isinstance(word_string, unicode):
+        word_string = unicodedata.normalize('NFKD', word_string).encode('ascii','ignore')
+    word_list.append(word_string)
+    #count += 1
+    #if count == 20:
+    #    break
+
+word_list = json.dumps(word_list)
+with open('./../assets/js/auto_completion.js', 'r') as file:
+    # read a list of lines into data
+    jscode = file.readlines()
+
+var_start_line = 103
+
+if len(jscode) >= var_start_line:
+    jscode[var_start_line-1] = "var word_list = " + word_list + ";\n"
+else:
+    jscode.append("\n")
+    jscode.append("var word_list = " + word_list + ";\n")
+
+# and write everything back
+with open('./../assets/js/auto_completion.js', 'w') as file:
+    file.writelines(jscode)
+
 integrated_db_conn.close()
 
 end = timer()
@@ -109,8 +141,8 @@ print (end - start)
 db_conn = sqlite3.connect(database_file_integrated)
 db_cursor = db_conn.cursor()
 
-db_cursor.execute("SELECT * FROM page_rank ORDER BY rank_value DESC")
-page_rank_dict = db_cursor.fetchall()
+#db_cursor.execute("SELECT * FROM page_rank ORDER BY rank_value DESC")
+#page_rank_dict = db_cursor.fetchall()
 db_cursor.execute("SELECT * FROM lexicon")
 lexicon = db_cursor.fetchall()
 db_cursor.execute("SELECT * FROM inverted_index")
@@ -155,9 +187,9 @@ with open("test.out", 'w') as do:
     for entry in inverted_index: 
         do.write(repr(entry)+'\n')
     
-    do.write("\npage rank:\n")
-    for (crawler_id, document_id, rank_value) in page_rank_dict: 
-        do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + str(rank_value) + ')' + '\n')
+    #do.write("\npage rank:\n")
+    #for (crawler_id, document_id, rank_value) in page_rank_dict: 
+    #    do.write('(' + str(crawler_id) + ', ' + str(document_id) + ', ' + str(rank_value) + ')' + '\n')
     '''
     do.write("links:\n")
     for link in links: 

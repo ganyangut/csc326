@@ -5,10 +5,7 @@ from collections import OrderedDict
 # each History stores up to 20 popular keywords
 # key: user_email or "anonymous"
 # value: History
-
-    
-
-class UserHistoryIndex(dict):
+class UserHistoryIndex(dict):    
     def __init__(self):
         dict.__init__(self)
 
@@ -20,8 +17,7 @@ class UserHistoryIndex(dict):
         self[_email] = History()
         return self[_email]
 
-class History(OrderedDict):    
-    
+class History(OrderedDict):        
     def __init__(self):
         OrderedDict.__init__(self)    
     
@@ -73,7 +69,7 @@ class History(OrderedDict):
 # each RecentWords stores up to 10 recent keywords
 # key: user_email
 # value: RecentWords
-class UserRecentWordsIndex(dict):
+class UserRecentWordsIndex(dict):    
     def __init__(self):
         dict.__init__(self)
 
@@ -85,8 +81,7 @@ class UserRecentWordsIndex(dict):
         self[_email] = RecentWords()
         return self[_email]
 
-class RecentWords(list):    
-    
+class RecentWords(list):        
     def __init__(self):
         list.__init__(self)    
     
@@ -102,7 +97,6 @@ class RecentWords(list):
 # key is document id
 # value is document
 class DocumentIndex(OrderedDict):    
-    
     def __init__(self):
         OrderedDict.__init__(self)
 
@@ -115,7 +109,6 @@ class DocumentIndex(OrderedDict):
 
 # a data structure for each entry in the document index
 class Document():    
-    
     def __init__(self, url="", depth=0, title="", short_description="", words=None):
         if not isinstance(url, basestring):
             raise ValueError("document url must be a basestring")
@@ -139,8 +132,7 @@ class Document():
 
 # key is word id
 # value is as set of document ids
-class InvertedIndex(dict):    
-    
+class InvertedIndex(dict):     
     def __init__(self):
         dict.__init__(self)
 
@@ -168,8 +160,7 @@ class InvertedIndex(dict):
 
 # key is word string
 # value is as set of document urls
-class ResolvedInvertedIndex(dict):    
-    
+class ResolvedInvertedIndex(dict):     
     def __init__(self):
         dict.__init__(self)
 

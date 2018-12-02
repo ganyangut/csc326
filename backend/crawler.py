@@ -74,13 +74,16 @@ class crawler(object):
                     url TEXT, 
                     title TEXT, 
                     short_description TEXT
-                );     
-                CREATE TABLE IF NOT EXISTS page_rank(
-                    crawler_id INTEGER,
-                    document_id INTEGER,
-                    rank_value REAL
-                );    
+                );                 
                 """) 
+
+        '''
+        CREATE TABLE IF NOT EXISTS page_rank(
+            crawler_id INTEGER,
+            document_id INTEGER,
+            rank_value REAL
+        );   
+        '''
         self.db_conn.commit()
 
         self._url_queue = [ ]
@@ -137,12 +140,6 @@ class crawler(object):
             'textarea', 'style', 'area', 'map', 'base', 'basefont', 'param',
         ])
 
-        #self._ignored_tags = set([
-        #    'embed', 'iframe', 'frame', 
-        #    'object', 'svg', 'canvas', 'applet', 'frameset', 
-        #    'textarea', 'style', 'area', 'map', 'base', 'basefont', 'param',
-        #])
-
         # set of words to ignore
         self._ignored_words = set([
             '', 'the', 'of', 'at', 'oamazon', 'in', 'is', 'it',
@@ -159,7 +156,7 @@ class crawler(object):
         self._curr_depth = 0
         self._curr_url = ""
         self._curr_doc_id = 0
-        self._font_size = 1
+        self._font_size = 0
         self._curr_words = None
 
         # get all urls into the queue
@@ -212,11 +209,6 @@ class crawler(object):
             self._word_id_cache[word] = word_id            
         
         # add the word to inverted index and resolved inverted index
-        if self._curr_url == "http://www.eecg.toronto.edu/~enright" and word == "amazon":
-            print "!!!!!!!!!!!!!!!!!!!!!!!!"
-            print self._font_size
-            print "!!!!!!!!!!!!!!!!!!!!!!!!"
-
         self.inverted_index.add(word_id, self._curr_doc_id, self._font_size)
         self.resolved_inverted_index.add(word, self._curr_url)   
         
@@ -272,9 +264,6 @@ class crawler(object):
             if isinstance(title_text, unicode):
                 title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
 
-            #print "crawler id="+ repr(self.crawler_id)
-            #print "document title="+ repr(title_text)
-
             # update document title for document id self._curr_doc_id
             self.document_index[self._curr_doc_id].title = title_text
 
@@ -292,11 +281,6 @@ class crawler(object):
         if dest_url in self._doc_id_cache:
             skip = True
 
-        #print "href="+repr(dest_url), \
-        #      "title="+repr(attr(elem,"title")), \
-        #      "alt="+repr(attr(elem,"alt")), \
-        #      "text="+repr(self._text_of(elem))
-
         # add the just found URL to the url queue
         self._url_queue.append((dest_url, self._curr_depth))
         
@@ -306,72 +290,19 @@ class crawler(object):
         
         # add depth and title/alt/text to index for destination url
         if not skip:
-            self.document_index[self.document_id(dest_url)].depth = self._curr_depth
-            '''
-            title_text = attr(elem,"title")
-            # change unicode string to ascii string
-            if isinstance(title_text, unicode):
-                title_text = unicodedata.normalize('NFKD', title_text).encode('ascii','ignore')
-            #print "visit a title text:"
-            #print title_text
-            if not self.document_index[self.document_id(dest_url)].title:
-                self.document_index[self.document_id(dest_url)].title = title_text                       
-            
-            # get text
-            text = attr(elem,"alt") + self._text_of(elem)
-            # change unicode string to ascii string
-            if isinstance(text, unicode):
-                text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
-            # break into lines and remove leading and trailing space on each
-            lines = (line.strip() for line in text.splitlines())
-            # break multi-head lines
-            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-            # get first 3 non-blank lines                
-            short_description = [ ]
-            line_counter = 0
-            for chunk in chunks:
-                if line_counter >= 3:
-                    break                    
-                if chunk:
-                    if '{' in chunk:
-                        continue
-                    short_description.append(chunk)
-                    line_counter += 1
-            self.document_index[self.document_id(dest_url)].short_description = "\n".join(short_description)
-
-            # insert into database
-            #self.db_cursor.execute(''''''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? '''''', 
-            #                        ("\n".join(short_description), self.crawler_id, self.document_id(dest_url)))
-            '''
+            self.document_index[self.document_id(dest_url)].depth = self._curr_depth            
             
     def _add_words_to_document(self):
         # knowing self._curr_doc_id and the list of all words and their
         # font sizes (in self._curr_words), add all the words into the
         # database for this document
         self.document_index[self._curr_doc_id].words = self._curr_words
-        #print "    num words="+ str(len(self._curr_words))
 
     def _increase_font_factor(self, factor):
         """Increade/decrease the current font size."""
         def increase_it(elem):
-            #if factor < 0:
-            #    self._font_size = 1
-            #else:
-            #    self._font_size = factor
             self._font_size += factor
-            '''
-            if self._curr_url == "http://www.eecg.toronto.edu/~enright":
-                print
-                print "--------------------------------------------"
-                print elem.name.lower()
-                print factor
-                print self._font_size
-                print "--------------------------------------------"
-                print
-            '''
-
-
-
+        
         return increase_it
     
     def _visit_ignore(self, elem):
@@ -424,12 +355,6 @@ class crawler(object):
 
                 if tag.parent != stack[-1]:
                     self._exit[stack[-1].name.lower()](stack[-1])
-                    if self._curr_url == "http://www.eecg.toronto.edu/~enright":
-                        print "!!!!!!!!!!!!!!!!!!!!!!!!"
-                        print "exit"
-                        print tag.name.lower()
-                        print self._font_size                        
-                        print "!!!!!!!!!!!!!!!!!!!!!!!!"
                     stack.pop()
 
                 tag_name = tag.name.lower()
@@ -440,12 +365,6 @@ class crawler(object):
                         tag = NextTag(tag.nextSibling)
                     else:
                         self._exit[stack[-1].name.lower()](stack[-1])
-                        if self._curr_url == "http://www.eecg.toronto.edu/~enright":
-                            print "!!!!!!!!!!!!!!!!!!!!!!!!"
-                            print "exit"
-                            print tag_name
-                            print self._font_size                        
-                            print "!!!!!!!!!!!!!!!!!!!!!!!!"
                         stack.pop()
                         tag = NextTag(tag.parent.nextSibling)
                     
@@ -455,28 +374,12 @@ class crawler(object):
                 self._enter[tag_name](tag)
                 stack.append(tag)
 
-                if self._curr_url == "http://www.eecg.toronto.edu/~enright":
-                    print "!!!!!!!!!!!!!!!!!!!!!!!!"
-                    print "enter"
-                    print tag_name
-                    print self._font_size                        
-                    print "!!!!!!!!!!!!!!!!!!!!!!!!"
-
                 # if no title tag, use h1 as title
                 if tag_name == "h1":
 
-                    if self._curr_url == "http://www.amazon.ca/gp/prime":
-                        print "url-h1-----"
                     h1_text = self._text_of(tag).strip()
-
-                    if self._curr_url == "http://www.amazon.ca/gp/prime":
-                        print "url-h1 text-----"
-                        print h1_text
-                    if h1_text:                    
-                        if self._curr_url == "http://www.amazon.ca/gp/prime":
-                            print "h1"
-                            print h1_text
-
+                    
+                    if h1_text:
                         # change unicode string to ascii string
                         if isinstance(h1_text, unicode):
                             h1_text = unicodedata.normalize('NFKD', h1_text).encode('ascii','ignore')
@@ -487,9 +390,6 @@ class crawler(object):
                             self.db_cursor.execute('''UPDATE document_index SET title = ? WHERE crawler_id = ? AND document_id = ? ''', 
                                                     (h1_text, self.crawler_id, self._curr_doc_id))
                         elif not self.document_index[self._curr_doc_id].short_description:
-                            if self._curr_url == "http://www.eecg.toronto.edu/~enright/":
-                                print "short_description2"
-                                print h1_text
                             self.document_index[self._curr_doc_id].short_description = h1_text
                 
                 # if no short_description, use h2 h3 h4 as short_description
@@ -500,10 +400,6 @@ class crawler(object):
                         if isinstance(h234_text, unicode):
                             h234_text = unicodedata.normalize('NFKD', h234_text).encode('ascii','ignore')
                         self.document_index[self._curr_doc_id].short_description = h234_text
-
-                        if self._curr_url == "http://www.amazon.ca/gp/prime":
-                            print "h234 text"
-                            print h234_text
             
             # text (text, cdata, comments, etc.)
             #else:
@@ -543,54 +439,19 @@ class crawler(object):
                 self._curr_depth = depth_ + 1
                 self._curr_url = url
                 self._curr_doc_id = doc_id
-                self._font_size = 1
+                self._font_size = 0
                 self._curr_words = [ ]
                 self._index_document(soup)
                 self._add_words_to_document()
                 
+                # extract short description form meta description field
                 short_description = soup.find("meta", attrs= {'name': 'description'})
                 if short_description:
                     short_description = short_description["content"]
                     if short_description:
                         if isinstance(short_description, unicode):
                             short_description = unicodedata.normalize('NFKD', short_description).encode('ascii','ignore')
-                        self.document_index[self._curr_doc_id].short_description = short_description
-                        
-                        if self._curr_url == "http://www.amazon.ca/gp/prime":
-                            print "short_description1"
-                        #print "short_description:"
-                        #print type(short_description)
-                        #print short_description
-                        # insert into database
-                        #self.db_cursor.execute('''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? ''', 
-                        #                        (short_description, self.crawler_id, self._curr_doc_id))            
-
-                '''
-                # get text
-                text = soup.getText(separator=u' ')
-                if isinstance(text, unicode):
-                    text = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
-                # break into lines and remove leading and trailing space on each
-                lines = (line.strip() for line in text.splitlines())
-                # break multi-head lines
-                chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-                # get first 3 non-blank lines                
-                short_description = [ ]
-                line_counter = 0
-                for chunk in chunks:
-                    if line_counter > 4:
-                        break
-                    if chunk:
-                        if line_counter > 1:
-                            short_description.append(chunk)
-                        line_counter += 1
-                self.document_index[self._curr_doc_id].short_description = "\n".join(short_description)   
-                
-                # insert into database
-                self.db_cursor.execute(''''''UPDATE document_index SET short_description = ? WHERE crawler_id = ? AND document_id = ? '''''', 
-                                        ("\n".join(short_description), self.crawler_id, self._curr_doc_id))             
-                '''
-                #print "    url="+repr(self._curr_url)
+                        self.document_index[self._curr_doc_id].short_description = short_description                 
             
             except Exception as e:
                 print "Exception as e:"
@@ -608,9 +469,9 @@ class crawler(object):
                                     (self.document_index[document_id].short_description, self.crawler_id, document_id))       
 
         page_rank_dict = page_rank(self.links)
-        sorted_page_rank_dict = sorted(page_rank_dict.items(), key = lambda x: -x[1])
-        for (document_id, rank_value) in sorted_page_rank_dict:
-            self.db_cursor.execute('''INSERT INTO page_rank VALUES (?,?,?)''', (self.crawler_id, document_id, rank_value))
+        #sorted_page_rank_dict = sorted(page_rank_dict.items(), key = lambda x: -x[1])
+        #for (document_id, rank_value) in sorted_page_rank_dict:
+        #    self.db_cursor.execute('''INSERT INTO page_rank VALUES (?,?,?)''', (self.crawler_id, document_id, rank_value))
         
         for word_id in self.inverted_index:             
             for document_id in self.inverted_index[word_id]: 
@@ -656,61 +517,3 @@ if __name__ == "__main__":
 
     print "time used: "
     print (end - start)
-
-
-
-
-
-
-    # code below is for testing
-
-    #bot.crawl(depth=0)
-    
-    #print bot._url_queue
-    #print bot._doc_id_cache
-    #print bot._word_id_cache
-    #print bot.document_index
-    #print bot.inverted_index
-    #print bot.resolved_inverted_index
-    #print "lexicon: "
-    #print bot.lexicon
-    
-    #print bot.get_inverted_index()
-    #print bot.get_resolved_inverted_index()
-    #print bot.get_title(35)
-    #print bot.get_short_description(35)
-    
-    #print "words: "
-    #print bot.document_index[1].words
-    #print "links: "
-    #print bot.document_index[35].links
-    '''
-    for doc_id in bot.document_index:
-        #if bot.document_index[doc_id].depth <= 1:
-        print "url: " + bot.document_index[doc_id].url
-        print "depth: " + str(bot.document_index[doc_id].depth)
-        print "title: " + bot.get_title(doc_id)
-        print "description: " + bot.get_short_description(doc_id)
-        #if bot.document_index[doc_id].words:
-        #print bot.document_index[doc_id].words
-        #if bot.document_index[doc_id].links:
-        #print bot.document_index[doc_id].links
-    '''
-
-    '''   
-    bot._curr_words = []
-    bot.document_id("url: a")
-    bot.document_id("url: b")
-    bot.word_id("wordc")
-    bot.word_id("wordd")
-    print bot._curr_words
-    print bot.document_index
-    indexexample =  ({1: set([1, 2]), 2: set([1, 3])})
-    print indexexample
-    
-    title = bot.get_title(2)
-    '''
-
-
-    
-    

@@ -5,10 +5,10 @@ import httplib2
 import requests
 import os
 import sqlite3 as lite
+from timeit import default_timer as timer
 from backend.static_variables import StaticVar
 from backend.data_structures import UserHistoryIndex, History, UserRecentWordsIndex, RecentWords
 from backend.database import MyDatabase
-
 from bottle import Bottle, route, run, template, get, post, request, static_file, redirect, app, error
 from oauth2client.client import OAuth2WebServerFlow, flow_from_clientsecrets
 from googleapiclient.errors import HttpError
@@ -54,7 +54,7 @@ def show_results():
         first_word = first_word.lower()
     else:
         first_word = ""
-    print "first_word: "+repr(first_word)+"\n"
+    print "\nfirst_word: "+repr(first_word)+"\n"
     redirect('/keyword/'+first_word+'/page_no/1')
 
 # pagination for urls found
@@ -62,6 +62,8 @@ def show_results():
 def search_first_word(keyword,page_no):
     first_word = keyword
     
+    start = timer()
+
     # connect to database
     db_conn = lite.connect(database_file)
     myDB = MyDatabase(db_conn)
@@ -78,7 +80,7 @@ def search_first_word(keyword,page_no):
     # get document ids and crawler ids based on page number
     url_counts = len(sorted_document_id)    
     page_num_counts = pagination(url_counts)
-    cur_page_num=int(page_no)
+    cur_page_num = int(page_no)
     if cur_page_num > 0:
         cur_page_num = cur_page_num -1
     start_num = cur_page_num * num_per_page
@@ -87,8 +89,12 @@ def search_first_word(keyword,page_no):
 
     db_conn.close()
 
+    end = timer()
+    print "time used: "
+    print (end - start)
+
     return template('./templates/result_page.tpl', keywords=keywords, words_count=words_count,
-                    login=False, history=history, first_word=first_word, document=document, cur_page_num=cur_page_num,
+                    login=False, history=history, first_word=first_word, document=document, cur_page_num=page_no,
                     num_per_page=num_per_page, page_num_counts=page_num_counts)
 
 def pagination(url_counts):
