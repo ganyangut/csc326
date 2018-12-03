@@ -40,14 +40,12 @@
             <input id="search_button" value="Waldoge Search" type="submit">
             %if login and recent_words:
                 %length = len(recent_words)
-                %print "length: "+ repr(length)
                 <table id="recentSearchedWords">
                     <tr>
                         <th colspan="{{length}}" style="font-size:20px">Recent Searched Words</th>
                     </tr> 
                     <tr>
                     %for word in recent_words:
-                        %print word
                         <th>{{word}}</th>
                     %end
                     </tr>
@@ -55,13 +53,28 @@
             %end
         </form>
 
-    
+    <!--calculator button-->
+    %if calculation_result != '':
+        <h1>{{keywords}} = {{calculation_result}}
+            <a href="/calculator/{{calculation_result}}" id="calculator-button" class="btn btn-primary">calculator</a>
+        </h1>
+    %end
+    <!--dictionary button-->
+    <h1>
+        <a href="/dictionary/{{first_word}}" id="calculator-button" class="btn btn-primary">Definition of "{{first_word}}"</a>
+    </h1>
+
     <!--if input is empty do nothing-->
     % if keywords.strip() != '':
-        <h1> <a id="font1">Search for <a id="keyword_font">"{{keywords}}"  </h1>
+        %if keywords == corrected_keywords:
+            <h1> <a id="font1">Search for </a><a id="keyword_font">"{{keywords}}" </a> </h1>
+        %else:
+            <h1> <a id="font1">Search for </a><a id="keyword_font">"{{corrected_keywords}}" </a> </h1>
+            <h1> <a id ="font2">Instead of </a><a id="keywords_font2">"{{keywords}}"  </a></h1>
+        %end
     % end
 
-    <div class="row">        
+    <div class="row1">        
         <!-- if a none-empty phrase is submitted, list the number od keywords in the pharse and 
             the number of apperances for each keyword in the pharse 
         -->
@@ -121,58 +134,27 @@
             %end
             %i=0
             <ul class="pagination">
+            %if cur_page_num != 1:
+                <li><a href="/keyword/{{keywords}}/page_no/{{cur_page_num-1}}">&laquo;</a></li>
+            %end
             %while i < page_num_counts:
                 %i=i+1
-                <li><a href="/keyword/{{keywords}}/page_no/{{i}}">{{i}}</a> </li>
+                %if i == cur_page_num:
+                    <li><a class="active" href="/keyword/{{keywords}}/page_no/{{i}}" style="background-color: #4CAF50;
+                            color: white;">{{i}}</a> </li>
+                %else:
+                    <li><a href="/keyword/{{keywords}}/page_no/{{i}}">{{i}}</a> </li>
+                %end
+            %end
+            % if cur_page_num != page_num_counts:
+                <li><a href="/keyword/{{keywords}}/page_no/{{cur_page_num+1}}">&raquo;</a></li>
             %end
             </ul>
         %else:
-            <p> No urls found</p>
+            <p style="font-size:20px"> No urls found</p>
         %end
         </div>
-        <!--
-        <table id = "urls" class="column2">
-                %if document:
-                    <tr>
-                        <th colspan="3" style="font-size:20px">Urls sorted by PageRank scores</th>
-                    </tr>
-                    <tr>
-                        <th>title</th>
-                        <th>urls</th>
-                        <th>short_description</th>
-                    </tr>
-                    % for entry in document:
-                        <tr>
-                            <td id="td2">{{entry[1]}}</td>
-                            <td id="td2"><a href={{entry[0]}}>{{entry[0]}}</a></th>
-                            <td id="td2">{{entry[2]}}</td>
-                        </tr>
-                    %end
-                                                            
-                    <tr>
-                    <th  colspan="3">
-                        <ul class="pagination">
-                        
-                        %i=0
-                        %while i < page_num_counts:
-                            %i=i+1
-                        
-                            <li><a href="/keyword/{{keywords}}/page_no/{{i}}">{{i}}</a> </li>
-                            
-                        
-                        %end
-                        </ul>
-                    </th>
-                    </tr>
-                    
-                %else:
-                    <tr>
-                        <th style="font-size:20px">    No urls found    </th>
-                    <tr>
-                %end
-
-        </table>
-        -->
+        
     </div>
 
 

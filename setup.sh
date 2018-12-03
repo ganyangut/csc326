@@ -29,6 +29,10 @@ pip install --upgrade boto
 pip install --upgrade awscli
 # install numpy:
 pip install --upgrade numpy
+#install pyspellchecker
+pip install pyspellchecker
+#install autocorrect
+pip install autocorrect
 
 # install the Apache benchmarking tool
 sudo apt-get install -y apache2-utils

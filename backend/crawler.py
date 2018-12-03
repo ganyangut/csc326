@@ -77,13 +77,6 @@ class crawler(object):
                 );                 
                 """) 
 
-        '''
-        CREATE TABLE IF NOT EXISTS page_rank(
-            crawler_id INTEGER,
-            document_id INTEGER,
-            rank_value REAL
-        );   
-        '''
         self.db_conn.commit()
 
         self._url_queue = [ ]
@@ -469,9 +462,6 @@ class crawler(object):
                                     (self.document_index[document_id].short_description, self.crawler_id, document_id))       
 
         page_rank_dict = page_rank(self.links)
-        #sorted_page_rank_dict = sorted(page_rank_dict.items(), key = lambda x: -x[1])
-        #for (document_id, rank_value) in sorted_page_rank_dict:
-        #    self.db_cursor.execute('''INSERT INTO page_rank VALUES (?,?,?)''', (self.crawler_id, document_id, rank_value))
         
         for word_id in self.inverted_index:             
             for document_id in self.inverted_index[word_id]: 

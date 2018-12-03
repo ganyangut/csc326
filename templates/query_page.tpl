@@ -39,14 +39,12 @@
         <input id="search_button" value="Waldoge Search" type="submit">
         %if login and recent_words:
             %length = len(recent_words)
-            %print "length: "+ repr(length)
             <table id="recentSearchedWords">
                 <tr>
                     <th colspan="{{length}}" style="font-size:20px">Recent Searched Words</th>
                 </tr> 
                 <tr>
                 %for word in recent_words:
-                    %print word
                     <th>{{word}}</th>
                 %end
                 </tr>

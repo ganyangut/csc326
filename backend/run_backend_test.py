@@ -60,13 +60,7 @@ integrated_db_cursor.executescript("""
             short_description TEXT
         );
         """)
-'''
-CREATE TABLE IF NOT EXISTS page_rank(
-    crawler_id INTEGER,
-    document_id INTEGER,
-    rank_value REAL
-);  
-'''
+
 integrated_db_conn.commit()
 
 for database_file in dbfile_list:   
@@ -85,10 +79,6 @@ for database_file in dbfile_list:
     document_index = db_cursor.fetchall()    
     integrated_db_cursor.executemany('INSERT INTO document_index VALUES (?, ?, ?, ?, ?)', document_index)
     
-    #db_cursor.execute('SELECT * FROM page_rank')
-    #page_rank = db_cursor.fetchall()    
-    #integrated_db_cursor.executemany('INSERT INTO page_rank VALUES (?, ?, ?)', page_rank)
-    
     # clean up
     db_conn.close()
     if os.path.isfile(database_file):
@@ -99,14 +89,11 @@ integrated_db_conn.commit()
 integrated_db_cursor.execute("SELECT DISTINCT word_string FROM lexicon")
 words_from_db = integrated_db_cursor.fetchall()
 word_list = []
-#count = 0
+
 for (word_string, ) in words_from_db:
     if isinstance(word_string, unicode):
         word_string = unicodedata.normalize('NFKD', word_string).encode('ascii','ignore')
     word_list.append(word_string)
-    #count += 1
-    #if count == 20:
-    #    break
 
 word_list = json.dumps(word_list)
 with open('./../assets/js/auto_completion.js', 'r') as file:
@@ -156,12 +143,6 @@ db_conn.close()
 #page_rank_dict.insert(0, ["crawler_id", "document_id", "rank_value"])
 #pp = pprint.PrettyPrinter(indent=4)
 #pp.pprint(page_rank_dict)
-
-
-
-
-
-
 
 
 

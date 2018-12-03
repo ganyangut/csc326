@@ -97,10 +97,12 @@ h1{
 h2, h3{
     background-color: white;
 }
+
 div.row{
     float: left;
     position: relative;
 }
+
 .column1{
     float: left;
    /* width: 40%;*/
@@ -109,6 +111,7 @@ div.row{
    /* top:20px;*/
     left:30px;
 }
+
 .column2{
     float: left;
     width: 90%;
@@ -130,6 +133,17 @@ div.row{
 
 #keywords_font{
     font-size: 26px;
+    color: #353434;
+    margin-left: 20px;
+}
+
+#font2{
+    font-size: 16px;
+    color: #ffffff;
+}
+
+#keywords_font2{
+    font-size: 14px;
     color: #353434;
     margin-left: 20px;
 }
@@ -161,10 +175,21 @@ td{
 a.result{
     font-size: 18px;
 }
+
 a.result_url{
     font-size: 14px;
     color: green;
 }
+
 a.snippet{
     font-size: 13px;
+}
+
+.pagination a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.pagination a:hover:not(.active) {
+    background-color: #ddd;
 }
