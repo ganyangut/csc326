@@ -1,9 +1,11 @@
+from __future__ import division 
 import Queue
 import operator
 import json
 import httplib2
 import requests
 import os
+import urllib
 import sqlite3 as lite
 from backend.static_variables import StaticVar
 from backend.data_structures import UserHistoryIndex, History, UserRecentWordsIndex, RecentWords
@@ -28,7 +30,7 @@ keywords = ''
 first_word = ''
 words_count = []
 corrected_keywords = ""
-calculation_result = ''
+calculation_result = 0.0
 
 num_per_page = 0
 page_num_counts = 0
@@ -37,8 +39,8 @@ document = []
 
 SCOPE = StaticVar.SCOPE
 REDIRECT_URI = StaticVar.REDIRECT_URI
-sessions_opts                     %print word= StaticVar.sessions_opts
-database_file                     %print word= 'backend/'+StaticVar.database_file
+sessions_opts = StaticVar.sessions_opts
+database_file = 'backend/'+StaticVar.database_file
 num_per_page = StaticVar.num_per_page
 
 history = History()
@@ -69,7 +71,7 @@ def show_results():
         try:
             calculation_result = eval(keywords)
         except:
-            calculation_result = ''
+            calculation_result = 0.0
     
     # split keyword string into words and count them
     # store words in a dict
@@ -88,7 +90,17 @@ def show_results():
         first_word = words_list[0]
         # lowercase first keyword
         first_word = first_word.lower()
-        redirect('/keyword/' + keywords + '/page_no/1')
+
+        # encode url
+        quoted_url=''
+        if '/' in keywords:
+            quoted_url = keywords.replace('/','%')
+        else:
+            quoted_url = urllib.quote_plus(keywords)
+        
+        redirect('/keyword/' + quoted_url + '/page_no/1')
+
+        #redirect('/keyword/' + keywords + '/page_no/1')
 
 def autocorrect(misspelled):
     """most likely correction for everything up to a double typo"""
@@ -101,6 +113,12 @@ def autocorrect(misspelled):
 # pagination for urls found
 @route('/keyword/<keyword>/page_no/<page_no>')
 def search_first_word(keyword, page_no):
+    # decode url    
+    if "%" in keyword:
+        keyword = keyword.replace('%','/')
+    else:
+        keyword = urllib.unquote_plus(keyword)
+    
     # split keyword string into words
     words_list = keyword.split()
 

@@ -34,8 +34,8 @@ else:
     conn.run_instances("ami-0ac019f4fcb7cb7e6", instance_type="t2.micro", key_name="waldoge_key_pair", security_groups=["csc326-group20"])   
 
 # check deployment result
-instances = conn.get_only_instances()
 time.sleep(0.02)
+instances = conn.get_only_instances()
 for instance in instances:
     while instance.state == u'pending':  
         time.sleep(0.02)
