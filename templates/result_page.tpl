@@ -123,7 +123,7 @@
             <ul class="pagination">
             %while i < page_num_counts:
                 %i=i+1
-                <li><a href="/keyword/{{first_word}}/page_no/{{i}}">{{i}}</a> </li>
+                <li><a href="/keyword/{{keywords}}/page_no/{{i}}">{{i}}</a> </li>
             %end
             </ul>
         %else:
@@ -157,7 +157,7 @@
                         %while i < page_num_counts:
                             %i=i+1
                         
-                            <li><a href="/keyword/{{first_word}}/page_no/{{i}}">{{i}}</a> </li>
+                            <li><a href="/keyword/{{keywords}}/page_no/{{i}}">{{i}}</a> </li>
                             
                         
                         %end

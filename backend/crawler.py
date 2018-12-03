@@ -156,7 +156,7 @@ class crawler(object):
         self._curr_depth = 0
         self._curr_url = ""
         self._curr_doc_id = 0
-        self._font_size = 0
+        self._font_size = 1
         self._curr_words = None
 
         # get all urls into the queue
@@ -439,7 +439,7 @@ class crawler(object):
                 self._curr_depth = depth_ + 1
                 self._curr_url = url
                 self._curr_doc_id = doc_id
-                self._font_size = 0
+                self._font_size = 1
                 self._curr_words = [ ]
                 self._index_document(soup)
                 self._add_words_to_document()

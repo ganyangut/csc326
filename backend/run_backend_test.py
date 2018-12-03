@@ -113,7 +113,7 @@ with open('./../assets/js/auto_completion.js', 'r') as file:
     # read a list of lines into data
     jscode = file.readlines()
 
-var_start_line = 103
+var_start_line = 105
 
 if len(jscode) >= var_start_line:
     jscode[var_start_line-1] = "var word_list = " + word_list + ";\n"
