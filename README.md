@@ -5,6 +5,33 @@ a search engine project
 note: all shell scripts are written in bash syntax
 If you are in a csh, please run bash first.
 
+## Lab 4
+
+### AWS
+
+* bash deployment script:
+  * lab4_run_page_on_aws.sh
+
+* python termination script (terminate by instance id):
+  * instance_deployment/stop_instance_by_id.py
+
+* python termination script (terminate all):
+  * instance_deployment/stop_all_instances.py
+
+* python termination script (terminate all and delete all data on the instance):
+  * instance_deployment/terminate_all_instances.py
+
+### Local
+
+* bash script to install dependencies:
+  * setup.sh
+
+* python script to run backend:
+  * backend/run_backend_test.py
+
+* python script to run frontend on localhost:8081:
+  * frontend.py
+
 ## Lab 3
 
 ### Bonus
