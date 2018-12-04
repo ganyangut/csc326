@@ -31,3 +31,7 @@ pip install --upgrade autocorrect
 
 # install the Apache benchmarking tool
 sudo apt-get install -y apache2-utils
+
+# run frontend
+cd lab4_code
+sudo python frontend.py

@@ -1,0 +1,55 @@
+/* Code By Saleh Ibne Omar */
+/* reference from "https://code.sololearn.com/Ww9mr0y2h0QG/#html" */
+body {
+    margin: 0;
+    padding: 0;
+
+}
+
+.saleh {
+    /* main contain majhe anar jonne ai class 2nd div e ai class ase */
+    margin: 0 auto;
+}
+
+.calcontainer {
+    /* ai class ta form er modde kora hoice form er size tik orar jonne */
+    
+    margin-left: 0;
+    margin-top: 50px;
+    width: 316px;
+}
+
+#panel {
+    /* calculator er display er jonne ai id kora hoie */
+    text-align: right;
+    width: 274px;
+    height: 80px;
+    font-size: 26px;
+    background-color: white;
+}
+
+#home-button{
+    margin-top: 20px;
+    margin-left: 90%;
+}
+
+#panel:hover {
+    /* calculator er display er jonne ai id kora hoie */
+    cursor: col-resize;
+}
+
+.bttn {
+    /* button gulo ke style korar jonne ai class */
+    margin-bottom: 8px;
+    margin-left: 5px;
+    width: 59px;
+    height: 45px;
+    font-size: 22px;
+}
+
+.bttne {
+    /* last er 2 ta button  ke style korar jonne ai class */
+    width: 120px;
+    margin-top: 10px;
+    margin-right: 11px;
+}

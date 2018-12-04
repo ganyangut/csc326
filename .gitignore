@@ -1,9 +1,0 @@
-backend/*.pyc
-backend/*.db
-#backend/*.out
-
-data
-
-instance_deployment/copy_to_aws/lab1_code/backend/*.pyc
-instance_deployment/copy_to_aws/lab3_code/backend/*.pyc
-/*.pyc
